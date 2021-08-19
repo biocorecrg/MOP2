@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-nextflow.preview.dsl=2
+nextflow.enable.dsl=2
 
 /* 
  * Define the pipeline parameters
@@ -29,12 +29,13 @@ fast5                     : ${params.fast5}
 reference                 : ${params.reference}
 annotation                : ${params.annotation}
 
+granularity				  : ${params.annotation}
+
 ref_type                  : ${params.ref_type}
 seq_type                  : ${params.seq_type}
 
 output                    : ${params.output}
 qualityqc                 : ${params.qualityqc}
-granularity               : ${params.granularity}
 
 basecaller                : ${params.basecaller}
 basecaller_opt            : ${params.basecaller_opt}
@@ -63,8 +64,6 @@ email                     : ${params.email}
 // Help and avoiding typos
 if (params.help) exit 1
 if (params.resume) exit 1, "Are you making the classical --resume typo? Be careful!!!! ;)"
-granularity = 1000000000
-if (params.granularity == "") granularity = 1000000000
 
 // check multi5 and GPU usage. GPU maybe can be removed as param if there is a way to detect it
 if (params.GPU != "ON" && params.GPU != "OFF") exit 1, "Please specify ON or OFF in GPU processors are available"
@@ -87,20 +86,9 @@ demultiplexer_opt   = params.demultiplexing_opt
 mapper      		= params.mapper
 mapper_opt   		= params.mapper_opt
 counter_opt   		= params.counter_opt 
-granularity			= params.granularity 
 gpu				    = params.GPU
 
-if (params.basecaller != "guppy" && gpu != "OFF") {
-	log.info "GPU param will be set to OFF since the basecaller is not guppy"
-	gpu = "OFF"
-}
 
-
-// if you are using GPU analyse the whole dataset, otherwise make batch of 4,000 sequences if they are single fast5
-// or single batches of multi fast5 sequences
-//multi5_type_for_granularity.merge(fast5_4_granularity.collect()).map{
-//    (params.GPU == "YES" ? params.granularity  : (it[0] == 0 ? it[1..-1].collate(4000) : it[1..-1].collate(1)) )
-//}
 // Output folders
 outputFastq    = "${params.output}/fastq_files"
 outputFast5    = "${params.output}/fast5_files"
@@ -136,8 +124,6 @@ Channel
 params.barcodekit = ""
 if (demultiplexer == "") demultiplexer = "OFF"
 
-if (params.granularity == "") params.granularity = 1000000000
-
 if (params.ref_type == "genome") {
 	if (params.annotation != "") {
 		annotation = file(params.annotation)
@@ -145,8 +131,13 @@ if (params.ref_type == "genome") {
 	}
 }
  
-include TEST_FAST5 from "${baseDir}/modules/test_fast5"
-include BASECALL_ONT from "${baseDir}/modules/modules.nf" addParams(GPU_OPTION: gpu)
+def subworkflowsDir = "${baseDir}/BioNextflow/subworkflows"
+
+def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'basecall_cpus')
+
+include { GET_WORKFLOWS; BASECALL as BASECALL_GUPPY; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy.nf" addParams(EXTRAPARS_BC: params.basecaller_opt, EXTRAPARS_DEM: params.demultiplexing_opt, LABEL: guppy_basecall_label, GPU_OPTION: gpu, OUTPUT: outputFast5)
+
+
 
 
 fast5_files.map { 
@@ -158,19 +149,17 @@ fast5_files.map {
 
 
 
-workflow flow1 {	
-    fast5_type = TEST_FAST5(fast5_files)
-	if (fast5_type == 0) granularity = 4000
-	if (gpu == "YES") granularity = 1000000000
-	
+workflow flow1 {		
 	fast5_per_folder.map{
 		def folder_name = it[0]
-		def buffer_files = it[1].flatten().collate(granularity)
+		def buffer_files = it[1].flatten().collate(params.granularity)
 		[folder_name, buffer_files]
 	}.transpose().set{ fast5_4_analysis }
 
-	if (demultiplexer == "OFF") BASECALL_ONT(fast5_4_analysis, fast5_type, basecaller, basecaller_opt, params.seq_type)
- 	
+	GET_WORKFLOWS(params.flowcell, params.kit).view()
+
+	if (demultiplexer == "OFF") BASECALL_GUPPY(fast5_4_analysis, params.flowcell, params.kit)
+ 	if (demultiplexer == "GUPPY") GUPPY_BASECALL_DEMULTI (fast5_4_analysis, params.flowcell, params.kit)
 }
 
 workflow {
