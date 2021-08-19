@@ -1,6 +1,4 @@
 singularity
-data/
-bin/albacore
 bin/multi_to_single_fast5
 bin/read_fast5_basecaller.py
 bin/ont*
