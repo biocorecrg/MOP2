@@ -27,6 +27,7 @@ if True:
         ary = l.strip().split()
         IDs[ary[1]] = ary[2]
 fh.close()
+print(IDs)
 
 outprefix = os.path.splitext(sys.argv[2])[0]
 outext = os.path.splitext(sys.argv[2])[1]
