@@ -154,7 +154,17 @@ include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt"
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"])
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"])
 include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"])
+include { FASTQCP as FASTQC} from "${subworkflowsDir}/qc/fastqc" addParams(LABEL: 'big_cpus')
+include { SORT as SAMTOOLS_SORT; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus')
+include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" 
+include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"])
+include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"])
 include { concatenateFastQFiles } from "${baseDir}/local_modules"
+include { MinIONQC } from "${baseDir}/local_modules"
+include { bam2stats } from "${baseDir}/local_modules"
+include { AssignReads } from "${baseDir}/local_modules"
+include { countStats } from "${baseDir}/local_modules"
+include { joinCountsStats } from "${baseDir}/local_modules"
 
 fast5_files.map { 
     def filepath = file(it)
@@ -181,10 +191,12 @@ workflow flow1 {
 		} 
  	    bc_fastq = reshapeSamples(basecalled_fastq)
 		bc_fast5 = reshapeSamples(outbc.basecalled_fast5)
+		bc_stats = reshapeSamples(outbc.basecalling_stats)
 
 	emit:
     	basecalled_fast5 = bc_fast5
     	basecalled_fastq = bc_fastq
+    	basecalled_stats = bc_stats
 
 }
 
@@ -235,6 +247,8 @@ workflow flow2 {
 	emit:
     	basecalled_fast5 =  fast5_res
     	basecalled_fastq = basecalled_fastq_res
+    	basecalled_stats = reshapeSamples(outbc.basecalling_stats)
+
 		
 }
 
@@ -256,12 +270,63 @@ workflow {
 
 	def bc_fast5 = outf.basecalled_fast5
 	def bc_fastq = outf.basecalled_fastq
-
-	fastq_files = concatenateFastQFiles(bc_fastq.groupTuple())
 	
-	if (params.mapping == "graphmap") GRAPHMAP(fastq_files, reference)
-	if (params.mapping == "graphmap2") GRAPHMAP2(fastq_files, reference)
-	if (params.mapping == "minimap2") MINIMAP2(fastq_files, reference)
+	// Concatenate fastq files
+	fastq_files = concatenateFastQFiles(bc_fastq.groupTuple())
+
+	// Perform fastqc QC on fastq
+	fastqc_files = FASTQC(fastq_files)
+
+	// Perform MinIONQC on basecalling stats
+	MinIONQC(outf.basecalled_stats.groupTuple())
+
+	// Perform mapping on fastq files
+	if (params.mapping == "graphmap") aln_reads = GRAPHMAP(fastq_files, reference)
+	if (params.mapping == "graphmap2") aln_reads = GRAPHMAP2(fastq_files, reference)
+	if (params.mapping == "minimap2") aln_reads = MINIMAP2(fastq_files, reference)
+	
+	// Perform SORTING and INDEXING on bam files
+	sorted_alns = SAMTOOLS_SORT(aln_reads)
+	aln_indexes = SAMTOOLS_INDEX(sorted_alns)
+
+	// Perform bam2stats on sorted bams
+	aln_stats = bam2stats(sorted_alns)
+	
+	// ADDING NanoPlot on sorted bams
+	nanoplot_qcs = NANOPLOT_QC(sorted_alns)
+	
+	// ADDING COUNTING / ASSIGNMENT
+	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
+		read_counts = NANOCOUNT(sorted_alns)
+		assignments = AssignReads(sorted_alns, "nanocount")
+		stat_counts = countStats(assignments)
+		stats_counts = joinCountsStats(stat_counts.map{ it[1]}.collect())
+	}
+	else if (params.counting == "htseq" && params.ref_type == "genome") {
+		htseq_out = HTSEQ_COUNT(params.annotation, sorted_alns)
+		read_counts = htseq_out.counts
+		assignments = AssignReads(htseq_out.bam, "htseq")
+		stat_counts = countStats(assignments)
+		stats_counts = joinCountsStats(stat_counts.map{ it[1]}.collect())
+
+	} else if (params.counting == "NO") {
+	} else {
+		println "ERROR ################################################################"
+		println "${params.counting} is not compatible with ${params.ref_type}"
+		println "htseq requires a genome as reference and an annotation in GTF"
+		println "nanocount requires a transcriptome as a reference"		
+		println "ERROR ################################################################"
+		println "Exiting ..."
+		System.exit(0)
+	} 
+	
+	stats_counts.view()
+	// ADDING COUNTING QC
+	
+	// ADDING REPORTING 
+
+	// ADDING MULTIQC
+	
 	
 }
 

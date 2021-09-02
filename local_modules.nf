@@ -1,14 +1,14 @@
 process extracting_demultiplexed_fastq {
 	label 'basecall_cpus'
-    tag { idfile }
+    tag "${ idfile }"
 	//publishDir outputFastq,  mode: 'copy'
 			
 	input:
-	tuple val(idfile), file(demux), file(fastq) 
+	tuple val(idfile), path(demux), path(fastq) 
 	
 	
 	output:
-	tuple val(idfile), file ("*.fastq.gz")
+	tuple val(idfile), path ("*.fastq.gz")
 
 	script:
 	"""
@@ -21,11 +21,11 @@ process extracting_demultiplexed_fast5 {
 	label 'more_cpus'
 	container 'lpryszcz/deeplexicon:1.2.0'
 
-    tag { idfile }
+    tag "${ idfile }"
 	//publishDir outputFast5,  mode: 'copy'
 		
 	input:
-	tuple val(idfile), file("demux_*"), file("*")
+	tuple val(idfile), path("demux_*"), file("*")
 
 	output:
 	file("*")
@@ -45,15 +45,15 @@ process extracting_demultiplexed_fast5 {
 *  Concatenate FastQ files
 */
 process concatenateFastQFiles {
-    tag {idfile} 
+    tag "${idfile}"
 
 	//publishDir outputFastq, pattern: "*.fq.gz",  mode: 'copy'
 
     input:
-    tuple val(idfile), file(demultifq)
+    tuple val(idfile), path(demultifq)
 
     output:
-    tuple val(idfile), file("${idfile}.fq.gz") 
+    tuple val(idfile), path("${idfile}.fq.gz") 
     
 
     script:
@@ -62,3 +62,116 @@ process concatenateFastQFiles {
     """
 }
 
+/*
+*  Perform QC on fast5 files
+*/
+
+process MinIONQC {
+    tag "${folder_name}"
+    label 'big_cpus'
+    container 'biocorecrg/mopprepr:0.7'
+    //publishDir outputQual, mode: 'copy'
+    errorStrategy 'ignore'
+    
+    input:
+    tuple val(folder_name), path("summaries_*") 
+
+    output:
+    tuple val(folder_name), path ("${folder_name}_QC"), emit: qc_folders
+    tuple val(folder_name), path ("final_summary.stats"), emit: summary_stats
+
+    script:
+    """
+      if [ -f "summaries_" ]; then
+	  ln -s summaries_ final_summary.stats
+	  else 
+		  head -n 1 summaries_1 > final_summary.stats
+	      for i in summaries_*; do grep -v "filename" \$i >> final_summary.stats; done
+	  fi
+      MinIONQC.R -i final_summary.stats -o ${folder_name}_QC -q ${params.qualityqc} -p ${task.cpus}
+    """
+}
+
+/*
+*  Perform bam2stats QC 
+*/
+process bam2stats {
+    tag "${id}" 
+   
+    input:
+    tuple val(id), path(bamfile)
+
+    output:
+    tuple val(id), path ("${id}.stat")
+    
+    script:
+    """
+    bam2stats.py ${bamfile} > ${id}.stat
+    """
+}
+
+/*
+*
+*/
+
+process AssignReads {
+    tag "${id}"
+   
+    input:
+    tuple val(id), path(input)
+	val(tool)
+
+    output:
+    tuple val(id), path ("${id}.assigned")
+    
+    script:
+    if (tool == "nanocount")
+	    """
+		samtools view -F 256 ${input} |cut -f 1,3 > ${id}.assigned
+    	"""
+    else if(tool == "htseq")
+    	"""
+			samtools view ${input} | awk '{gsub(/XF:Z:/,"",\$NF); print \$1"\t"\$NF}' |grep -v '__' > ${id}.assigned
+    	"""
+    else 
+        error "Invalid alignment mode: ${tool}"
+}
+
+/*
+*
+*/
+
+process countStats {
+    tag "${id}"
+   
+    input:
+    tuple val(id), path(input)
+
+    output:
+    tuple val(id), path ("${id}.count.stats")
+    
+    script:
+	"""
+		wc -l ${input} |sed s@.assigned@@g | awk '{print \$2"\t"\$1}' > ${id}.count.stats
+    """
+}
+
+/*
+*  Join countStats 
+*/
+process joinCountsStats {
+   
+    input:
+    file "alnqc_*" 
+
+    output:
+    file("alnQC_mqc.txt") 
+    
+    script:
+    """
+    echo '# id: alnQC
+# plot_type: \'table\'
+# section_name: \'Alignment QC\' ' > alnQC_mqc.txt
+    cat alnqc_* | grep -v "#" >> alnQC_mqc.txt
+    """
+}
