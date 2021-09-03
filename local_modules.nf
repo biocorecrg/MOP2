@@ -1,7 +1,18 @@
+// Output folders
+outputFastq    = "${params.output}/fastq_files"
+outputFast5    = "${params.output}/fast5_files"
+outputQual     = "${params.output}/QC_files"
+outputMultiQC  = "${params.output}/report"
+outputMapping  = "${params.output}/alignment"
+//outputCRAM     = "${params.output}/cram_files"
+outputCounts   = "${params.output}/counts"
+//outputVars     = "${params.output}/variants"
+outputAssigned = "${params.output}/assigned"
+outputReport   = file("${outputMultiQC}/multiqc_report.html")
+
 process extracting_demultiplexed_fastq {
 	label 'basecall_cpus'
     tag "${ idfile }"
-	//publishDir outputFastq,  mode: 'copy'
 			
 	input:
 	tuple val(idfile), path(demux), path(fastq) 
@@ -20,9 +31,9 @@ process extracting_demultiplexed_fastq {
 process extracting_demultiplexed_fast5 {
 	label 'more_cpus'
 	container 'lpryszcz/deeplexicon:1.2.0'
-
     tag "${ idfile }"
-	//publishDir outputFast5,  mode: 'copy'
+    publishDir(outputFast5, mode:'move') 
+   
 		
 	input:
 	tuple val(idfile), path("demux_*"), file("*")
@@ -46,8 +57,7 @@ process extracting_demultiplexed_fast5 {
 */
 process concatenateFastQFiles {
     tag "${idfile}"
-
-	//publishDir outputFastq, pattern: "*.fq.gz",  mode: 'copy'
+    publishDir(outputFastq, mode:'copy') 
 
     input:
     tuple val(idfile), path(demultifq)
@@ -70,15 +80,14 @@ process MinIONQC {
     tag "${folder_name}"
     label 'big_cpus'
     container 'biocorecrg/mopprepr:0.7'
-    //publishDir outputQual, mode: 'copy'
     errorStrategy 'ignore'
     
     input:
     tuple val(folder_name), path("summaries_*") 
 
     output:
-    tuple val(folder_name), path ("${folder_name}_QC"), emit: qc_folders
-    tuple val(folder_name), path ("final_summary.stats"), emit: summary_stats
+    tuple val(folder_name), path ("${folder_name}_QC")
+    //tuple val(folder_name), path ("final_summary.stats"), emit: summary_stats
 
     script:
     """
@@ -96,6 +105,7 @@ process MinIONQC {
 *  Perform bam2stats QC 
 */
 process bam2stats {
+ 
     tag "${id}" 
    
     input:
@@ -116,7 +126,8 @@ process bam2stats {
 
 process AssignReads {
     tag "${id}"
-   
+    publishDir(outputAssigned, mode:'copy') 
+
     input:
     tuple val(id), path(input)
 	val(tool)
@@ -157,21 +168,45 @@ process countStats {
 }
 
 /*
-*  Join countStats 
+*  Join AlnStats 
 */
-process joinCountsStats {
+process joinAlnStats {
    
     input:
     file "alnqc_*" 
 
     output:
-    file("alnQC_mqc.txt") 
+    path("alnQC_mqc.txt") 
     
     script:
     """
     echo '# id: alnQC
 # plot_type: \'table\'
 # section_name: \'Alignment QC\' ' > alnQC_mqc.txt
+    cat alnqc_* | head -n 1| sed s@#@@g >> alnQC_mqc.txt
     cat alnqc_* | grep -v "#" >> alnQC_mqc.txt
     """
 }
+
+/*
+*  Join Count Stats 
+*/
+process joinCountStats {
+   
+    input:
+    file "stats_*" 
+
+	output:
+	path("counts_mqc.txt")
+	
+	script:
+	"""
+	echo '# id: Read counts
+	# plot_type: \'table\'
+	# section_name: Read counts 
+	File name	\'Counts\' ' > counts_mqc.txt 
+		cat stats_*  >> counts_mqc.txt 
+		"""
+} 
+
+

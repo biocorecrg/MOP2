@@ -69,7 +69,7 @@ reference = file(params.reference)
 if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
-logo = file("$baseDir/../docs/logo_small.png")
+logo = file("$baseDir/img/logo_small.png")
 
 def gpu				    = params.GPU
 
@@ -87,9 +87,9 @@ outputFast5    = "${params.output}/fast5_files"
 outputQual     = "${params.output}/QC_files"
 outputMultiQC  = "${params.output}/report"
 outputMapping  = "${params.output}/alignment"
-outputCRAM     = "${params.output}/cram_files"
+//outputCRAM     = "${params.output}/cram_files"
 outputCounts   = "${params.output}/counts"
-outputVars     = "${params.output}/variants"
+//outputVars     = "${params.output}/variants"
 outputAssigned = "${params.output}/assigned"
 outputReport   = file("${outputMultiQC}/multiqc_report.html")
 
@@ -125,6 +125,7 @@ if (params.ref_type == "genome") {
 def subworkflowsDir = "${baseDir}/BioNextflow/subworkflows"
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'basecall_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'demulti_cpus')
+def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 
 // Create a channel for tool options
 pars_tools = file("${baseDir}/tool_opt.tsv")
@@ -147,7 +148,7 @@ for( line : allLines ) {
 // Check tools
 checkTools(tools, progPars)
 
-include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu)
+include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, OUTPUT: output_bc)
 include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
 include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5} from "${baseDir}/local_modules"
 include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
@@ -155,16 +156,18 @@ include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParam
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"])
 include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"])
 include { FASTQCP as FASTQC} from "${subworkflowsDir}/qc/fastqc" addParams(LABEL: 'big_cpus')
-include { SORT as SAMTOOLS_SORT; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus')
+include { SORT as SAMTOOLS_SORT; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus', OUTPUT:outputMapping)
 include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" 
-include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"])
-include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"])
+include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
+include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts)
+include { REPORT as MULTIQC } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles } from "${baseDir}/local_modules"
-include { MinIONQC } from "${baseDir}/local_modules"
+include { MinIONQC } from "${baseDir}/local_modules" 
 include { bam2stats } from "${baseDir}/local_modules"
 include { AssignReads } from "${baseDir}/local_modules"
 include { countStats } from "${baseDir}/local_modules"
-include { joinCountsStats } from "${baseDir}/local_modules"
+include { joinCountStats } from "${baseDir}/local_modules"
+include { joinAlnStats } from "${baseDir}/local_modules"
 
 fast5_files.map { 
     def filepath = file(it)
@@ -278,38 +281,62 @@ workflow {
 	fastqc_files = FASTQC(fastq_files)
 
 	// Perform MinIONQC on basecalling stats
-	MinIONQC(outf.basecalled_stats.groupTuple())
+	basecall_qc = MinIONQC(outf.basecalled_stats.groupTuple())
 
 	// Perform mapping on fastq files
-	if (params.mapping == "graphmap") aln_reads = GRAPHMAP(fastq_files, reference)
-	if (params.mapping == "graphmap2") aln_reads = GRAPHMAP2(fastq_files, reference)
-	if (params.mapping == "minimap2") aln_reads = MINIMAP2(fastq_files, reference)
-	
-	// Perform SORTING and INDEXING on bam files
-	sorted_alns = SAMTOOLS_SORT(aln_reads)
-	aln_indexes = SAMTOOLS_INDEX(sorted_alns)
+	if (params.mapping == "NO") {
+		stats_aln = Channel.value()	
+		sorted_alns = Channel.value()	
+		nanoplot_qcs = Channel.value()	
+	}
+	else {
+		switch(params.mapping) { 
+   			case "graphmap": 
+   			aln_reads = GRAPHMAP(fastq_files, reference)
+   			break
+   			case "graphmap2": 
+   			aln_reads = GRAPHMAP2(fastq_files, reference)
+   			case "minimap2": 
+   			break
+   			aln_reads = MINIMAP2(fastq_files, reference)
+   			break
+   			default: 
+			println "ERROR ################################################################"
+			println "${params.mapping} is not a supported alignment"
+			println "ERROR ################################################################"
+			println "Exiting ..."
+			System.exit(0)
+			break
+		}	 
+		// Perform SORTING and INDEXING on bam files
+		sorted_alns = SAMTOOLS_SORT(aln_reads)
+		aln_indexes = SAMTOOLS_INDEX(sorted_alns)
 
-	// Perform bam2stats on sorted bams
-	aln_stats = bam2stats(sorted_alns)
+		// Perform bam2stats on sorted bams
+		aln_stats = bam2stats(sorted_alns)
+		stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
 	
-	// ADDING NanoPlot on sorted bams
-	nanoplot_qcs = NANOPLOT_QC(sorted_alns)
+		// Perform NanoPlot on sorted bams
+		nanoplot_qcs = NANOPLOT_QC(sorted_alns)
+
+	}	
 	
-	// ADDING COUNTING / ASSIGNMENT
+	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
 		read_counts = NANOCOUNT(sorted_alns)
 		assignments = AssignReads(sorted_alns, "nanocount")
 		stat_counts = countStats(assignments)
-		stats_counts = joinCountsStats(stat_counts.map{ it[1]}.collect())
+		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
 	}
 	else if (params.counting == "htseq" && params.ref_type == "genome") {
 		htseq_out = HTSEQ_COUNT(params.annotation, sorted_alns)
 		read_counts = htseq_out.counts
 		assignments = AssignReads(htseq_out.bam, "htseq")
 		stat_counts = countStats(assignments)
-		stats_counts = joinCountsStats(stat_counts.map{ it[1]}.collect())
-
+		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
 	} else if (params.counting == "NO") {
+		// Default empty channels for reporting
+		stats_counts = Channel.value()
 	} else {
 		println "ERROR ################################################################"
 		println "${params.counting} is not compatible with ${params.ref_type}"
@@ -320,12 +347,10 @@ workflow {
 		System.exit(0)
 	} 
 	
-	stats_counts.view()
-	// ADDING COUNTING QC
-	
-	// ADDING REPORTING 
+	fastqc_files.mix(basecall_qc).map{it[1]}.set{qcs}
 
-	// ADDING MULTIQC
+	// Perform MULTIQC report
+	MULTIQC(qcs.mix(stats_counts, stats_aln, Channel.from(logo)).collect())
 	
 	
 }
