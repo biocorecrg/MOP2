@@ -29,7 +29,7 @@ fast5                     : ${params.fast5}
 reference                 : ${params.reference}
 annotation                : ${params.annotation}
 
-granularity				  : ${params.annotation}
+granularity				  : ${params.granularity}
 
 ref_type                  : ${params.ref_type}
 seq_type                  : ${params.seq_type}
@@ -150,13 +150,14 @@ checkTools(tools, progPars)
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, OUTPUT: output_bc)
 include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
-include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5} from "${baseDir}/local_modules"
+include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5} from "${baseDir}/local_modules" addParams(LABEL: 'big_cpus')
 include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"])
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"])
 include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"])
 include { FASTQCP as FASTQC} from "${subworkflowsDir}/qc/fastqc" addParams(LABEL: 'big_cpus')
 include { SORT as SAMTOOLS_SORT; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus', OUTPUT:outputMapping)
+include { CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
 include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" 
 include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts)
@@ -192,13 +193,13 @@ workflow flow1 {
 			nanofilt = NANOFILT_FILTER(outbc.basecalled_fastq)
 			basecalled_fastq = reshapeSamples(nanofilt.out)
 		} 
- 	    bc_fastq = reshapeSamples(basecalled_fastq)
+ 	    //bc_fastq = reshapeSamples(basecalled_fastq)
 		bc_fast5 = reshapeSamples(outbc.basecalled_fast5)
 		bc_stats = reshapeSamples(outbc.basecalling_stats)
 
 	emit:
     	basecalled_fast5 = bc_fast5
-    	basecalled_fastq = bc_fastq
+    	basecalled_fastq = basecalled_fastq
     	basecalled_stats = bc_stats
 
 }
@@ -221,7 +222,10 @@ workflow flow2 {
 			if (params.demulti_fast5 == "ON" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)
-				fast5_res = extracting_demultiplexed_fast5(alldemux.groupTuple().join(basecalledbc.groupTuple()))
+				//alldemux.view()
+				//basecalledbc.view()
+				
+				fast5_res = extracting_demultiplexed_fast5(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
 			}
 		// Demultiplex fastq	
 			demufq = extracting_demultiplexed_fastq(demux.join(outbc.basecalled_fastq))
@@ -241,15 +245,10 @@ workflow flow2 {
  			reshapedDemufq = nanofilt
 		}
 
-		reshapedDemufq.map {
- 			def nano_ids = it[0].split("---")
- 			def nano_dems = it[0].split("\\.")
- 				["${nano_ids[0]}---${nano_dems[-1]}", it[1]]
-	 	}.set{basecalled_fastq_res}
-
 	emit:
     	basecalled_fast5 =  fast5_res
-    	basecalled_fastq = basecalled_fastq_res
+    	//basecalled_fastq = basecalled_fastq_res
+    	basecalled_fastq = reshapedDemufq
     	basecalled_stats = reshapeSamples(outbc.basecalling_stats)
 
 		
@@ -274,12 +273,6 @@ workflow {
 	def bc_fast5 = outf.basecalled_fast5
 	def bc_fastq = outf.basecalled_fastq
 	
-	// Concatenate fastq files
-	fastq_files = concatenateFastQFiles(bc_fastq.groupTuple())
-
-	// Perform fastqc QC on fastq
-	fastqc_files = FASTQC(fastq_files)
-
 	// Perform MinIONQC on basecalling stats
 	basecall_qc = MinIONQC(outf.basecalled_stats.groupTuple())
 
@@ -292,13 +285,13 @@ workflow {
 	else {
 		switch(params.mapping) { 
    			case "graphmap": 
-   			aln_reads = GRAPHMAP(fastq_files, reference)
+   			aln_reads = GRAPHMAP(bc_fastq, reference)
    			break
    			case "graphmap2": 
-   			aln_reads = GRAPHMAP2(fastq_files, reference)
+   			aln_reads = GRAPHMAP2(bc_fastq, reference)
    			case "minimap2": 
    			break
-   			aln_reads = MINIMAP2(fastq_files, reference)
+   			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
    			default: 
 			println "ERROR ################################################################"
@@ -307,9 +300,17 @@ workflow {
 			println "Exiting ..."
 			System.exit(0)
 			break
+
 		}	 
+
+		// Concatenate bamfiles
+ 	    if (params.demultiplexing == "NO" ) reshaped_aln_reads = reshapeSamples(aln_reads)
+		else reshaped_aln_reads = reshapeDemuxSamples(aln_reads)
+
+		jaln_reads = SAMTOOLS_CAT(reshaped_aln_reads.groupTuple())
+
 		// Perform SORTING and INDEXING on bam files
-		sorted_alns = SAMTOOLS_SORT(aln_reads)
+		sorted_alns = SAMTOOLS_SORT(jaln_reads)
 		aln_indexes = SAMTOOLS_INDEX(sorted_alns)
 
 		// Perform bam2stats on sorted bams
@@ -320,6 +321,17 @@ workflow {
 		nanoplot_qcs = NANOPLOT_QC(sorted_alns)
 
 	}	
+
+	// Concatenate fastq files
+	if (params.demultiplexing == "NO" ) reshaped_bc_fastq = reshapeSamples(bc_fastq)
+	else reshaped_bc_fastq = reshapeDemuxSamples(bc_fastq)
+
+	fastq_files = concatenateFastQFiles(reshaped_bc_fastq.groupTuple())
+
+	// Perform fastqc QC on fastq
+	fastqc_files = FASTQC(fastq_files)
+
+
 	
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
@@ -370,6 +382,15 @@ workflow.onComplete {
 /*
 * FUNCTIONS
 */
+
+def reshapeDemuxSamples(inputChannel) {
+	def reshapedChannel = inputChannel.map {
+ 		def ids = it[0].split("---")
+ 		def dems = it[0].split("\\.")
+ 			["${ids[0]}---${dems[-1]}", it[1]]
+	 }
+	 return(reshapedChannel)
+}
 
 def reshapeSamples(inputChannel) {
     def reshapedChannel = inputChannel.map{

@@ -32,7 +32,7 @@ process extracting_demultiplexed_fast5 {
 	label 'more_cpus'
 	container 'lpryszcz/deeplexicon:1.2.0'
     tag "${ idfile }"
-    publishDir(outputFast5, mode:'move') 
+    publishDir(outputFast5, mode:'copy') 
    
 		
 	input:
@@ -45,7 +45,7 @@ process extracting_demultiplexed_fast5 {
 	"""
 	cat demux_* | grep -v ReadID >> dem.files
 	awk '{print \$2 > \$3".list" }' dem.files
-	for i in *.list; do mkdir `basename \$i .list`; fast5_subset --input ./ --save_path `basename \$i .list`/ --read_id_list \$i --batch_size 4000 -t ${task.cpus}; done 
+	for i in *.list; do mkdir `basename \$i .list`; fast5_subset --input ./ --save_path `basename \$i .list`/ --read_id_list \$i --batch_size 4000 -c vbz -t ${task.cpus}; done 
 	rm *.list
 	rm */filename_mapping.txt
 	rm dem.files 
