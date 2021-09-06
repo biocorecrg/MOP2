@@ -32,8 +32,8 @@ process extracting_demultiplexed_fast5 {
 	label 'more_cpus'
 	container 'lpryszcz/deeplexicon:1.2.0'
     tag "${ idfile }"
-    publishDir(outputFast5, mode:'copy') 
-   
+    if (params.saveSpace == "YES") publishDir(outputFast5, mode:'move') 
+    else publishDir(outputFast5, mode:'copy')    
 		
 	input:
 	tuple val(idfile), path("demux_*"), file("*")
@@ -53,10 +53,31 @@ process extracting_demultiplexed_fast5 {
 } 
 
 /*
+*  Clean files
+*/
+process cleanFile {
+    tag "${id}"
+    
+    input:
+    tuple val(id), path(file_to_remove)
+    val(file_to_wait1)
+	val(extension)
+
+	when: params.saveSpace == "YES"
+    
+    script:
+    """
+		for i in *${extension}; do rm \$(readlink -f \$i); done
+    """
+}
+
+
+/*
 *  Concatenate FastQ files
 */
 process concatenateFastQFiles {
     tag "${idfile}"
+    //if (params.saveSpace == "YES") publishDir(outputFastq, mode:'move') 
     publishDir(outputFastq, mode:'copy') 
 
     input:

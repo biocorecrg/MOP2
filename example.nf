@@ -46,13 +46,9 @@ demulti_fast5		      : ${params.demulti_fast5}
 filtering                 : ${params.filtering}
 mapping                   : ${params.mapping}
 
-map_type                  : ${params.map_type}
-
 counting                  : ${params.counting}
 
-downsampling			  : ${params.downsampling}
-
-variantcall          	  : ${params.variantcall}
+saveSpace   			  : ${params.saveSpace}
 
 email                     : ${params.email}
 """
@@ -79,7 +75,7 @@ tools["demultiplexing"] = params.demultiplexing
 tools["mapping"] = params.mapping
 tools["filtering"] = params.filtering
 tools["counting"] = params.counting
-tools["variantcall"] = params.variantcall
+//tools["variantcall"] = params.variantcall
 
 // Output folders
 outputFastq    = "${params.output}/fastq_files"
@@ -145,10 +141,13 @@ for( line : allLines ) {
     }  
 }
 
+if (params.saveSpace == "YES") outmode = "move"
+else outmode = "copy"
+
 // Check tools
 checkTools(tools, progPars)
 
-include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, OUTPUT: output_bc)
+include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
 include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5} from "${baseDir}/local_modules" addParams(LABEL: 'big_cpus')
 include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
@@ -162,13 +161,8 @@ include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot"
 include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts)
 include { REPORT as MULTIQC } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
-include { concatenateFastQFiles } from "${baseDir}/local_modules"
-include { MinIONQC } from "${baseDir}/local_modules" 
-include { bam2stats } from "${baseDir}/local_modules"
-include { AssignReads } from "${baseDir}/local_modules"
-include { countStats } from "${baseDir}/local_modules"
-include { joinCountStats } from "${baseDir}/local_modules"
-include { joinAlnStats } from "${baseDir}/local_modules"
+include { concatenateFastQFiles; MinIONQC; bam2stats; AssignReads; countStats; joinCountStats; joinAlnStats } from "${baseDir}/local_modules"
+include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${baseDir}/local_modules"
 
 fast5_files.map { 
     def filepath = file(it)
@@ -221,11 +215,11 @@ workflow flow2 {
 			// Optional demultiplex fast5 		
 			if (params.demulti_fast5 == "ON" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
-				alldemux = reshapeSamples(demux)
-				//alldemux.view()
-				//basecalledbc.view()
-				
+				alldemux = reshapeSamples(demux)				
 				fast5_res = extracting_demultiplexed_fast5(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				
+				// OPTIONAL CLEANING FASTQ5 FILES
+				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
 			}
 		// Demultiplex fastq	
 			demufq = extracting_demultiplexed_fastq(demux.join(outbc.basecalled_fastq))
@@ -313,6 +307,9 @@ workflow {
 		sorted_alns = SAMTOOLS_SORT(jaln_reads)
 		aln_indexes = SAMTOOLS_INDEX(sorted_alns)
 
+		// OPTIONAL CLEANING BAM FILES
+		bamCleanFile(reshaped_aln_reads.groupTuple(), jaln_reads.map{it[1]}.collect(), ".bam")
+
 		// Perform bam2stats on sorted bams
 		aln_stats = bam2stats(sorted_alns)
 		stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
@@ -331,7 +328,8 @@ workflow {
 	// Perform fastqc QC on fastq
 	fastqc_files = FASTQC(fastq_files)
 
-
+	// OPTIONAL CLEANING FASTQC FILES
+	fastqCleanFile(reshaped_bc_fastq.groupTuple(), fastq_files.map{it[1]}.collect().mix(fastqc_files.map{it[1]}.collect(), jaln_reads.map{it[1]}.collect()).collect(), ".gz")
 	
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
