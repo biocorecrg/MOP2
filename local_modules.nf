@@ -39,7 +39,7 @@ process extracting_demultiplexed_fast5_deeplexicon {
 	tuple val(idfile), path("demux_*"), file("*")
 
 	output:
-	file("*")
+	file("${idfile}-*")
 	
 	script:
 	"""
@@ -65,7 +65,7 @@ process extracting_demultiplexed_fast5_guppy {
 	tuple val(idfile), path("summaries_*"), file("*")
     
 	output:
-	file("*")
+	file("${idfile}-*")
 
     script:
     """
