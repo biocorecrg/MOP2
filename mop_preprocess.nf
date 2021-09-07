@@ -147,7 +147,7 @@ else outmode = "copy"
 // Check tools
 checkTools(tools, progPars)
 
-include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, OUTPUT: output_bc, OUTPUTMODE: outmode)
+include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
 include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5} from "${baseDir}/local_modules" addParams(LABEL: 'big_cpus')
 include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
