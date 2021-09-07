@@ -1,7 +1,7 @@
 singularity
-bin/multi_to_single_fast5
-bin/read_fast5_basecaller.py
-bin/ont*
-bin/guppy*
-work
-.next*
+mop_preprocess/bin/multi_to_single_fast5
+mop_preprocess/bin/read_fast5_basecaller.py
+mop_preprocess/bin/ont*
+mop_preprocess/bin/guppy*
+mop_preprocess/work
+mop_preprocess/.next*
