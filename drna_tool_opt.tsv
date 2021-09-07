@@ -1,0 +1,10 @@
+#step	tool	extrapars
+basecalling	guppy	""
+demultiplexing	deeplexicon	"-f multi -m $baseDir/deeplexicon/resnet20-final.h5"
+demultiplexing	guppy	"--barcode_kits EXP-NBD114"
+filtering	nanofilt	""
+mapping	graphmap	""
+mapping	graphmap2	"-x rnaseq"
+mapping	minimap2	"-uf -ax splice -k14"
+counting	htseq	"-a 0"
+counting	nanocount	""
