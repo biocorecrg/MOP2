@@ -118,7 +118,7 @@ if (params.ref_type == "genome") {
 	}
 }
  
-def subworkflowsDir = "${baseDir}/BioNextflow/subworkflows"
+def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'basecall_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'demulti_cpus')
 def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
