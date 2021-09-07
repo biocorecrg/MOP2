@@ -28,7 +28,7 @@ process extracting_demultiplexed_fastq {
 	"""
 }
 
-process extracting_demultiplexed_fast5 {
+process extracting_demultiplexed_fast5_deeplexicon {
 	label 'more_cpus'
 	container 'lpryszcz/deeplexicon:1.2.0'
     tag "${ idfile }"
@@ -51,6 +51,36 @@ process extracting_demultiplexed_fast5 {
 	rm dem.files 
 	"""
 } 
+
+process extracting_demultiplexed_fast5_guppy {
+    tag { idfile }
+    label (params.LABEL)
+    if (params.saveSpace == "YES") publishDir(outputFast5, mode:'move') 
+    else publishDir(outputFast5, mode:'copy')    
+
+    container "quay.io/biocontainers/ont-fast5-api:4.0.0--pyhdfd78af_0"
+
+             
+	input:
+	tuple val(idfile), path("summaries_*"), file("*")
+    
+	output:
+	file("*")
+
+    script:
+    """
+      if [ -f "summaries_" ]; then
+	  ln -s summaries_ final_summary.stats
+	  else 
+		  head -n 1 summaries_1 > final_summary.stats
+	      for i in summaries_*; do grep -v "filename" \$i | awk -F"\t" -v id=${idfile}  '{OFS="\t"; \$19 = id"---"\$19; print \$0}'  >> final_summary.stats; done
+	  fi
+
+		demux_fast5 -c vbz -t ${task.cpus} --input ./ --save_path ./ --summary_file final_summary.stats 
+		rm -fr barcode_arrangement
+    """
+}
+
 
 /*
 *  Clean files

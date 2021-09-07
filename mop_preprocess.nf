@@ -32,7 +32,7 @@ annotation                : ${params.annotation}
 granularity				  : ${params.granularity}
 
 ref_type                  : ${params.ref_type}
-seq_type                  : ${params.seq_type}
+pars_tools				  : ${params.pars_tools}
 
 output                    : ${params.output}
 qualityqc                 : ${params.qualityqc}
@@ -124,7 +124,7 @@ def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'demulti_cp
 def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 
 // Create a channel for tool options
-pars_tools = file("${baseDir}/tool_opt.tsv")
+pars_tools = file(params.pars_tools)
 if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools'"
 
 def progPars = [:]
@@ -149,7 +149,7 @@ checkTools(tools, progPars)
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
-include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5} from "${baseDir}/local_modules" addParams(LABEL: 'big_cpus')
+include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5_deeplexicon; extracting_demultiplexed_fast5_guppy} from "${baseDir}/local_modules" addParams(LABEL: 'big_cpus')
 include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"])
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"])
@@ -216,7 +216,7 @@ workflow flow2 {
 			if (params.demulti_fast5 == "ON" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
-				fast5_res = extracting_demultiplexed_fast5(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				fast5_res = extracting_demultiplexed_fast5_deeplexicon(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
 				
 				// OPTIONAL CLEANING FASTQ5 FILES
 				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
@@ -229,6 +229,18 @@ workflow flow2 {
 			outbc = GUPPY_BASECALL_DEMULTI (fast5_4_analysis, params.flowcell, params.kit)
 			demufq = outbc.basecalled_fastq
 			fast5_res = outbc.basecalled_fast5
+
+			// Optional demultiplex fast5 		
+			if (params.demulti_fast5 == "ON" ) {
+				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
+				alldemux = reshapeSamples(outbc.basecalling_stats)								
+				fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				
+				// OPTIONAL CLEANING FASTQ5 FILES
+				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
+			}
+
+
 		}
 		reshapedDemufq = demufq.transpose().map{
 			[it[1].name.replace(".fastq.gz", ""), it[1] ]
