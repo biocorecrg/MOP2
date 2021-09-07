@@ -1,6 +1,6 @@
 ## Version 2.0
 * Completely rewritten using the powerful [DSL2](https://www.nextflow.io/docs/latest/dsl2.html).
-* Subworkflows are stored in [BioNextflow](https://github.com/biocorecrg/BioNextflow) independent repository.
+* Subworkflows are stored in the independent repository [BioNextflow](https://github.com/biocorecrg/BioNextflow).
 * mop_preprocess (aka nanoprerocess)
   * now can read multiple runs per time
   * can demultiplex fast5 using guppy too
