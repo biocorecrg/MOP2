@@ -45,7 +45,7 @@ process extracting_demultiplexed_fast5 {
 	"""
 	cat demux_* | grep -v ReadID >> dem.files
 	awk '{print \$2 > \$3".list" }' dem.files
-	for i in *.list; do mkdir `basename \$i .list`; fast5_subset --input ./ --save_path `basename \$i .list`/ --read_id_list \$i --batch_size 4000 -c vbz -t ${task.cpus}; done 
+	for i in *.list; do mkdir ${idfile}---`basename \$i .list`; fast5_subset --input ./ --save_path ${idfile}---`basename \$i .list`/ --read_id_list \$i --batch_size 4000 -c vbz -t ${task.cpus}; done 
 	rm *.list
 	rm */filename_mapping.txt
 	rm dem.files 
