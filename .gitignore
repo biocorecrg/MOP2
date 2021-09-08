@@ -3,5 +3,5 @@ mop_preprocess/bin/multi_to_single_fast5
 mop_preprocess/bin/read_fast5_basecaller.py
 mop_preprocess/bin/ont*
 mop_preprocess/bin/guppy*
-mop_preprocess/work
-mop_preprocess/.next*
+*/work
+*/.next*
