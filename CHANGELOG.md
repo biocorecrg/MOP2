@@ -8,6 +8,7 @@
   * Parameters of each tool are stored in a tsv file. We have three different ones already pre-set for cDNA, DNA and dRNA (option --pars_tools)
   * demultiplexing, filtering, mapping and counting can be switched off by setting "NO" as a parameter
   * saveSpace can be set to "YES" to reduce the amount of disk space required. WARNING This will prevent the possibility to resume!
+  * Merged old NanoPreprocess and NanoPreprocessSimple in a mop_preprocess. Using fastq or fast5 will switch among the two executions.
 
 * ...
 
