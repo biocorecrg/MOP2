@@ -1,0 +1,53 @@
+N E X T F L O W  ~  version 21.04.3
+Launching `mop_mod.nf` [confident_cantor] - revision: 113ffb3b6a
+
+
+╔╦╗╔═╗╔═╗  ╔╦╗┌─┐┌┬┐
+║║║║ ║╠═╝  ║║║│ │ ││
+╩ ╩╚═╝╩    ╩ ╩└─┘─┴┘
+                                                                                       
+====================================================
+BIOCORE@CRG Master of Pores 2. Detection of RNA modification - N F  ~  version 2.0
+====================================================
+
+*****************   Input files    *******************
+input_path                              : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/../mop_preprocess/output/
+comparison                              : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/comparison.tsv
+
+********** reference has to be the genome *************
+reference                               : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/../anno/yeast_rRNA_ref.fa.gz
+output                                  : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/output_gen
+
+coverage                                : 5
+pars_tools								: /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/tools_opt.tsv
+
+************************* Flows *******************************
+epinano                             	: YES
+nanocompore                             : YES
+tombo_lsc                               : YES
+tombo_msc                               : YES
+
+
+email                                   : 
+
+Skipping the email
+
+[2d/f8e71c] Cached process > checkRef (Checking yeast_rRNA_ref.fa.gz)
+[7f/46f023] Cached process > NANOPOLISH_EVENTALIGN:index (snR36_WT)
+[d2/396d58] Cached process > NANOPOLISH_EVENTALIGN:index (snR36_KO)
+[af/aa2e16] Cached process > epinano_flow:indexReference (Indexing reference.fa)
+[8d/668a9f] Cached process > epinano_flow:callVariants (snR36_WT)
+[b3/7232ba] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch5.fast5)
+[77/9e1004] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch3.fast5)
+[7b/83c2ec] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch1.fast5)
+[70/671dd0] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_WT--batch0_2.fast5)
+[7f/72ca98] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_WT--batch0_1.fast5)
+[22/3d2d5f] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch0.fast5)
+[62/928edd] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch2.fast5)
+[64/386ffc] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch4.fast5)
+[3d/96269a] Cached process > epinano_flow:EPINANO_CALC_VAR_FREQUENCIES:calcVarFrequencies (snR36_WT)
+Pipeline BIOCORE@CRG Master of Pore completed!
+Started at  2021-09-08T19:09:59.400+02:00
+Finished at 2021-09-08T19:10:07.079+02:00
+Time elapsed: 7.7s
+Execution status: OK
