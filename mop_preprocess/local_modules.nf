@@ -132,23 +132,25 @@ process MinIONQC {
     label 'big_cpus'
     container 'biocorecrg/mopprepr:0.7'
     errorStrategy 'ignore'
+    publishDir(outputQual, mode:'copy', pattern: '*.stats') 
+
     
     input:
     tuple val(folder_name), path("summaries_*") 
 
     output:
     tuple val(folder_name), path ("${folder_name}_QC")
-    //tuple val(folder_name), path ("final_summary.stats"), emit: summary_stats
+    tuple val(folder_name), path ("*_summary.stats")
 
     script:
     """
       if [ -f "summaries_" ]; then
-	  ln -s summaries_ final_summary.stats
+	  ln -s summaries_ ${folder_name}_final_summary.stats
 	  else 
-		  head -n 1 summaries_1 > final_summary.stats
-	      for i in summaries_*; do grep -v "filename" \$i >> final_summary.stats; done
+		  head -n 1 summaries_1 > ${folder_name}_final_summary.stats
+	      for i in summaries_*; do grep -v "filename" \$i >> ${folder_name}_final_summary.stats; done
 	  fi
-      MinIONQC.R -i final_summary.stats -o ${folder_name}_QC -q ${params.qualityqc} -p ${task.cpus}
+      MinIONQC.R -i ${folder_name}_final_summary.stats -o ${folder_name}_QC -q ${params.qualityqc} -p ${task.cpus}
     """
 }
 

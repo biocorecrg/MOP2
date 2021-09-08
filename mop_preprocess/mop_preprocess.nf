@@ -15,12 +15,12 @@ params.resume          = false
 
 log.info """
 
-╔╦╗┌─┐┌─┐┌┬┐┌─┐┬─┐  ┌─┐┌─┐  ╔═╗╔═╗╦═╗╔═╗╔═╗
-║║║├─┤└─┐ │ ├┤ ├┬┘  │ │├┤   ╠═╝║ ║╠╦╝║╣ ╚═╗
-╩ ╩┴ ┴└─┘ ┴ └─┘┴└─  └─┘└    ╩  ╚═╝╩╚═╚═╝╚═╝
+╔╦╗╔═╗╔═╗  ╔═╗┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┌─┐┌─┐┌─┐
+║║║║ ║╠═╝  ╠═╝├┬┘├┤ ├─┘├┬┘│ ││  ├┤ └─┐└─┐
+╩ ╩╚═╝╩    ╩  ┴└─└─┘┴  ┴└─└─┘└─┘└─┘└─┘└─┘
                                                                                        
 ====================================================
-BIOCORE@CRG Preprocessing of Nanopore direct RNA - N F  ~  version ${version}
+BIOCORE@CRG Master of Pores 2. Preprocessing - N F  ~  version ${version}
 ====================================================
 
 kit                       : ${params.kit}
@@ -112,7 +112,7 @@ if (params.ref_type == "genome") {
 }
  
 def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
-def local_modules = "${baseDir}/../local_modules"
+def local_modules = "${baseDir}/local_modules"
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'basecall_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'demulti_cpus')
 def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
@@ -492,12 +492,41 @@ workflow preprocess_simple {
  }
 
 workflow.onComplete {
-    println "Pipeline BIOCORE@CRG Master of Pore completed!"
+    println "Pipeline BIOCORE@CRG Master of Pore - preprocess completed!"
     println "Started at  $workflow.start" 
     println "Finished at $workflow.complete"
     println "Time elapsed: $workflow.duration"
     println "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
 }
+
+/*
+* Mail notification
+*/
+
+if (params.email == "yourmail@yourdomain" || params.email == "") { 
+    log.info 'Skipping the email\n'
+}
+else {
+    log.info "Sending the email to ${params.email}\n"
+
+    workflow.onComplete {
+
+    def msg = """\
+        Pipeline BIOCORE@CRG Master of Pore 2 preprocess execution summary
+        ---------------------------
+        Completed at: ${workflow.complete}
+        Duration    : ${workflow.duration}
+        Success     : ${workflow.success}
+        workDir     : ${workflow.workDir}
+        exit status : ${workflow.exitStatus}
+        Error report: ${workflow.errorReport ?: '-'}
+        """
+        .stripIndent()
+
+        sendMail(to: params.email, subject: "Master of Pore 2 execution", body: msg)
+    }
+}
+
 
 /*
 * FUNCTIONS
