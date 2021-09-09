@@ -68,11 +68,13 @@ flows["tombo_msc"] = params.tombo_lsc
 
 // Output folders
 outputEpinanoFlow    = "${params.output}/epinano_flow"
+outputNanoPolComFlow = "${params.output}/nanopolish-compore_flow"
 
 
 include { indexReference; callVariants; checkRef } from "${local_modules}"
 include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
-include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus')
+include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow)
+include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow)
 
 include { GET_VERSION } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
 include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } from "${local_modules}"
@@ -143,7 +145,6 @@ workflow {
 	unique_samples.map {
     [it, file("${params.input_path}/fast5_files/${it}/*.fast5")]
 	}.transpose().set{fast5_files}
-//fast5_files.view()
 
 	ref_file = checkRef(reference)
 
@@ -151,7 +152,13 @@ workflow {
 		epinano_flow(bams, ref_file, comparisons)
 	}
 	if (params.nanocompore == "YES") {
-		event_align = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
+		concat_events = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
+		combs_events = mapIDPairs(comparisons, concat_events)
+		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
+				
+		//concat_events.view()
+		//comparisons.view()
+		//NANOCOMPORE(combs_events)
 		//event_align.groupTuple() 
 		//nanocompore_flow(bams, reference)
 	}
@@ -180,6 +187,15 @@ workflow epinano_flow {
 }
 
 
+
+def mapIDPairs (ids, values) {
+	combs = ids.combine(values, by:0).map{
+		[it[1], it[0], it[2]]
+	}.combine(values, by:0).map{
+		[it[1], it[0], it[2],  it[3]]
+	}
+	return(combs)
+}
 
 
 /*
