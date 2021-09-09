@@ -1,7 +1,7 @@
 ## Version 2.0
 * Completely rewritten using the powerful [DSL2](https://www.nextflow.io/docs/latest/dsl2.html).
 * Subworkflows are stored in the independent repository [BioNextflow](https://github.com/biocorecrg/BioNextflow).
-* mop_preprocess (aka nanoprerocess)
+* mop_preprocess (formerly known as nanoPreprocess + nanoPreprocessSimple)
   * now can read multiple runs per time
   * can demultiplex fast5 using guppy too
   * deeplexicon can be run on GPU too
@@ -9,6 +9,10 @@
   * demultiplexing, filtering, mapping and counting can be switched off by setting "NO" as a parameter
   * saveSpace can be set to "YES" to reduce the amount of disk space required. WARNING This will prevent the possibility to resume!
   * Merged old NanoPreprocess and NanoPreprocessSimple in a mop_preprocess. Using fastq or fast5 will switch among the two executions.
+
+* mop_mod (formerly known as nanoMod)
+  * now you can launch each analysis independently
+  * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare  
 
 * ...
 
