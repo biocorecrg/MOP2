@@ -71,19 +71,6 @@ outputEpinanoFlow    = "${params.output}/epinano_flow"
 outputNanoPolComFlow = "${params.output}/nanopolish-compore_flow"
 outputTomboFlow = "${params.output}/tombo_flow"
 
-
-include { indexReference; callVariants; checkRef; multiToSingleFast5; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc; mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus } from "${local_modules}"
-include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
-include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow)
-include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow)
-include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus')
-include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus')
-include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus')
-
-include { GET_VERSION } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
-include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } from "${local_modules}"
-
-
 // Create a channel for tool options
 pars_tools = file(params.pars_tools)
 if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools'"
@@ -101,6 +88,21 @@ for( line : allLines ) {
 		progPars["${list[0]}--${list[1]}"] = list[2].replace("\"", "").replace('$baseDir', "${baseDir}").replace('${baseDir}', "${baseDir}")
     }  
 }
+
+
+include { indexReference; callVariants; checkRef; multiToSingleFast5; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc; mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus } from "${local_modules}"
+include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
+include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
+include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
+include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
+include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_msc--tombo"])
+include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"])
+
+include { GET_VERSION } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
+include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } from "${local_modules}"
+
+
+
 
 /*
  * Creates the channels with comparisons
