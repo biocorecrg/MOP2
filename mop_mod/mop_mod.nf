@@ -69,12 +69,16 @@ flows["tombo_msc"] = params.tombo_lsc
 // Output folders
 outputEpinanoFlow    = "${params.output}/epinano_flow"
 outputNanoPolComFlow = "${params.output}/nanopolish-compore_flow"
+outputTomboFlow = "${params.output}/tombo_flow"
 
 
-include { indexReference; callVariants; checkRef } from "${local_modules}"
+include { indexReference; callVariants; checkRef; multiToSingleFast5; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc; mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus } from "${local_modules}"
 include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow)
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow)
+include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus')
+include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus')
+include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus')
 
 include { GET_VERSION } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
 include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } from "${local_modules}"
@@ -152,18 +156,122 @@ workflow {
 		epinano_flow(bams, ref_file, comparisons)
 	}
 	if (params.nanocompore == "YES") {
+		compore_polish_flow(comparisons, fast5_folders, bams, bais, fastqs, summaries, ref_file) 
+	}
+
+	if (params.tombo_lsc == "YES" || params.tombo_msc == "YES") {
+		tombo_data = tombo_common_flow(fast5_files, ref_file, comparisons)
+	    
+		if (params.tombo_msc == "YES") {
+			tombo_msc_flow(tombo_data, ref_file)
+			wiggle_msc = bedGraphToWig_msc(tombo_msc_flow.out.bed_graphs.transpose()).map{
+				["${it[0]}_msc", it[1] ]
+			}
+			stat_msc = tombo_msc_flow.out.dampened_wiggles.transpose().map{
+				["${it[0]}_msc", it[1] ]
+			}				
+		}
+		if (params.tombo_lsc == "YES") {
+			tombo_lsc_flow(tombo_data, ref_file)
+			wiggle_lsc = bedGraphToWig_lsc(tombo_lsc_flow.out.bed_graphs.transpose()).map{
+				["${it[0]}_lsc", it[1] ]
+			}
+			stat_lsc = tombo_lsc_flow.out.dampened_wiggles.transpose().map{
+				["${it[0]}_lsc", it[1] ]
+			}
+		}
+
+			wiggle_msc.mix(wiggle_lsc).branch {
+        		sampleplus: it[1] =~ /\.sample\.plus\./
+        		sampleminus: it[1] =~ /\.sample\.minus\./
+        		controlplus: it[1] =~ /\.control\.plus\./
+        		controlminus: it[1] =~ /\.control\.minus\./
+    		}.set{combo_tombo}
+			stat_lsc.mix(stat_msc).branch {
+        		plus: it[1] =~ /\.plus\./
+        		minus: it[1] =~ /\.minus\./
+    		}.set{combo_stats}
+
+    		mergeTomboWigsPlus("plus", mergeTomboScript, combo_tombo.sampleplus.join(combo_tombo.controlplus).join(combo_stats.plus))
+    		mergeTomboWigsMinus("minus", mergeTomboScript, combo_tombo.sampleminus.join(combo_tombo.controlminus).join(combo_stats.minus))
+	}
+}
+
+workflow tombo_common_flow {
+    take:
+	fast5_files
+	ref_file
+	comparisons
+	
+	main:
+	fast5_files.map{
+		["${it[0]}---${it[1].simpleName}", it[1]]
+	}.set{fast5_reshaped}
+	
+	single_fast5_folders = multiToSingleFast5(fast5_reshaped)
+	resquiggle = TOMBO_RESQUIGGLE_RNA(single_fast5_folders, ref_file)
+	
+	resquiggle.join(single_fast5_folders).map{
+		def ids = it[0].split("---")
+		["${ids[0]}", it[1], it[2]]
+	}.groupTuple().map{
+		[it[0], [it[1], it[2]]]
+	}.set{reshape_resquiggle}
+	
+	data_for_tombo = mapIDPairs(comparisons, reshape_resquiggle).map{
+		[it[0], it[1], it[2][0], it[2][1], it[3][0], it[3][1]]
+	}
+	
+	emit:
+		data_for_tombo
+}
+
+workflow tombo_msc_flow {
+    take:
+	data_for_tombo
+	reference
+	
+	main:
+	TOMBO_GET_MODIFICATION_MSC(data_for_tombo, reference)
+	bed_graphs = TOMBO_GET_MODIFICATION_MSC.out.bedgraphs
+	dampened_wiggles = TOMBO_GET_MODIFICATION_MSC.out.dampened_wiggles
+	
+	emit:
+		bed_graphs
+		dampened_wiggles
+	
+}
+
+workflow tombo_lsc_flow {
+    take:
+	data_for_tombo
+	reference
+	
+	main:
+	TOMBO_GET_MODIFICATION_LSC(data_for_tombo, reference)
+	bed_graphs = TOMBO_GET_MODIFICATION_LSC.out.bedgraphs
+	dampened_wiggles = TOMBO_GET_MODIFICATION_LSC.out.dampened_wiggles
+	
+	emit:
+		bed_graphs
+		dampened_wiggles
+
+}
+
+workflow compore_polish_flow {
+    take:
+		comparisons
+		fast5_folders
+		bams
+		bais
+		fastqs
+		summaries
+		ref_file		
+	
+	main:	
 		concat_events = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
 		combs_events = mapIDPairs(comparisons, concat_events)
 		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
-				
-		//concat_events.view()
-		//comparisons.view()
-		//NANOCOMPORE(combs_events)
-		//event_align.groupTuple() 
-		//nanocompore_flow(bams, reference)
-	}
-	
-	
 	
 }
 
@@ -186,16 +294,16 @@ workflow epinano_flow {
 	makeEpinanoPlots_del(per_site_for_plots, "del")
 }
 
-
-
 def mapIDPairs (ids, values) {
-	combs = ids.combine(values, by:0).map{
+	def combs = ids.combine(values, by:0).map{
 		[it[1], it[0], it[2]]
 	}.combine(values, by:0).map{
 		[it[1], it[0], it[2],  it[3]]
 	}
 	return(combs)
 }
+
+
 
 
 /*
