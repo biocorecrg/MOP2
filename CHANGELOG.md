@@ -12,7 +12,8 @@
 
 * mop_mod (formerly known as nanoMod)
   * now you can launch each analysis independently
-  * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare  
+  * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare 
+  * Fine tuning of parameter for each step in tools_opt.tsv
 
 * ...
 
