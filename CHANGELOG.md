@@ -1,6 +1,7 @@
 ## Version 2.0
-* Completely rewritten using the powerful [DSL2](https://www.nextflow.io/docs/latest/dsl2.html).
-* Subworkflows are stored in the independent repository [BioNextflow](https://github.com/biocorecrg/BioNextflow).
+Completely rewritten using the powerful [DSL2](https://www.nextflow.io/docs/latest/dsl2.html).
+Subworkflows are stored in the independent repository [BioNextflow](https://github.com/biocorecrg/BioNextflow).
+
 * mop_preprocess (formerly known as nanoPreprocess + nanoPreprocessSimple)
   * now can read multiple runs per time
   * can demultiplex fast5 using guppy too
@@ -15,7 +16,11 @@
   * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare 
   * Fine tuning of parameter for each step in tools_opt.tsv
 
-* ...
+* mop_tail (formerly known as nanoTail)
+  * now you can launch each analysis independently
+  * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare 
+  * Fine tuning of parameter for each step in tools_opt.tsv
+ 
 
 ## Version 1.1
 * Added a new module called NanoPreprocessSimple that starts from fastq files instead of fast5 files. It allows the analysis of multiple files at a time.
