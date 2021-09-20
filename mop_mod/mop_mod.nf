@@ -40,7 +40,6 @@ nanocompore                             : ${params.nanocompore}
 tombo_lsc                               : ${params.tombo_lsc}
 tombo_msc                               : ${params.tombo_msc}
 
-
 email                                   : ${params.email}
 """
 
@@ -52,9 +51,11 @@ if (params.resume) exit 1, "Are you making the classical --resume typo? Be caref
 reference = file(params.reference)
 if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 
-def local_modules = file("$baseDir/local_modules.nf")
-def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
+// include functions, outdirs from other files
+evaluate(new File("../outdirs.nf"))
+def local_modules = file("$baseDir/../local_modules.nf")
 
+def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
 model_folder = file("$baseDir/models/")
 if( !model_folder.exists() ) exit 1, "Missing folders with EpiNano's models!"
 joinScript = file("$baseDir/bin/join.r")
@@ -66,31 +67,11 @@ flows["nanocompore"] = params.nanocompore
 flows["tombo_lsc"] = params.tombo_msc
 flows["tombo_msc"] = params.tombo_lsc
 
-// Output folders
-outputEpinanoFlow    = "${params.output}/epinano_flow"
-outputNanoPolComFlow = "${params.output}/nanopolish-compore_flow"
-outputTomboFlow = "${params.output}/tombo_flow"
+include { getParameters; mapIDPairs } from "${local_modules}" 
 
 // Create a channel for tool options
-pars_tools = file(params.pars_tools)
-if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools'"
+progPars = getParameters(params.pars_tools)
 
-def progPars = [:]
-def tooList = [:]
-allLines  = pars_tools.readLines()
-
-for( line : allLines ) {
-    list = line.split("\t")
-    if (list.length <3) {
-		 error "ERROR!!! Tool option file has to be tab separated\n" 
-	}
-    if (!(list[0] =~ /#/ )) {
-		progPars["${list[0]}--${list[1]}"] = list[2].replace("\"", "").replace('$baseDir', "${baseDir}").replace('${baseDir}', "${baseDir}")
-    }  
-}
-
-
-include { indexReference; callVariants; checkRef; multiToSingleFast5; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc; mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus } from "${local_modules}"
 include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
@@ -98,9 +79,16 @@ include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem
 include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_msc--tombo"])
 include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"])
 
-include { GET_VERSION } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow)
-include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } from "${local_modules}"
+include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano" 
+include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modification/nanopolish" 
+include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore" 
+include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
 
+include { indexReference; callVariants; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
+include {  mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus} addParams(OUTPUT: outputTomboFlow) from "${local_modules}"
+include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } addParams(OUTPUT: outputEpinanoFlow) from "${local_modules}"
+
+include { multiToSingleFast5 } addParams(LABEL: 'big_cpus') from "${local_modules}"
 
 
 
@@ -121,12 +109,6 @@ if( !compfile.exists() ) exit 1, "Missing comparison file: ${compfile}. Specify 
             [ sampleID, ctrlID ]
         }
     }.set {comparisons}
-
-// Output folders
-output_epinano_flow = "${params.output}/Epinano_flow"
-output_tombo_lsc_flow = "${params.output}/Tombo_lsc_flow"
-output_tombo_msc_flow = "${params.output}/Tombo_msc_flow"
-output_nanocompore_flow = "${params.output}/Nanocompore_flow"
 
 
 workflow {	
@@ -197,6 +179,11 @@ workflow {
     		mergeTomboWigsPlus("plus", mergeTomboScript, combo_tombo.sampleplus.join(combo_tombo.controlplus).join(combo_stats.plus))
     		mergeTomboWigsMinus("minus", mergeTomboScript, combo_tombo.sampleminus.join(combo_tombo.controlminus).join(combo_stats.minus))
 	}
+	
+	all_ver = EPINANO_VER().mix(NANOPOLISH_VER())
+	.mix(NANOCOMPORE_VER()).mix(TOMBO_VER())
+	.collectFile(name: 'tool_version.txt', newLine: false, storeDir:params.output)
+
 }
 
 workflow tombo_common_flow {
@@ -295,16 +282,6 @@ workflow epinano_flow {
 	makeEpinanoPlots_mis(per_site_for_plots, "mis")
 	makeEpinanoPlots_del(per_site_for_plots, "del")
 }
-
-def mapIDPairs (ids, values) {
-	def combs = ids.combine(values, by:0).map{
-		[it[1], it[0], it[2]]
-	}.combine(values, by:0).map{
-		[it[1], it[0], it[2],  it[3]]
-	}
-	return(combs)
-}
-
 
 
 
