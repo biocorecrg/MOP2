@@ -62,6 +62,12 @@ if (params.resume) exit 1, "Are you making the classical --resume typo? Be caref
 // check multi5 and GPU usage. GPU maybe can be removed as param if there is a way to detect it
 if (params.GPU != "ON" && params.GPU != "OFF") exit 1, "Please specify ON or OFF in GPU processors are available"
 
+// include functions, outdirs from other files
+evaluate(new File("../outdirs.nf"))
+def local_modules = file("$baseDir/../local_modules.nf")
+def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
+joinScript = file("$baseDir/bin/join.r")
+
 // check input files
 reference = file(params.reference)
 if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
@@ -79,16 +85,7 @@ tools["filtering"] = params.filtering
 tools["counting"] = params.counting
 //tools["variantcall"] = params.variantcall
 
-// Output folders
-outputFastq    = "${params.output}/fastq_files"
-outputFast5    = "${params.output}/fast5_files"
-outputQual     = "${params.output}/QC_files"
-outputMultiQC  = "${params.output}/report"
-outputMapping  = "${params.output}/alignment"
-//outputCRAM     = "${params.output}/cram_files"
-outputCounts   = "${params.output}/counts"
-//outputVars     = "${params.output}/variants"
-outputAssigned = "${params.output}/assigned"
+// Output files
 outputReport   = file("${outputMultiQC}/multiqc_report.html")
 
 /*
@@ -111,49 +108,46 @@ if (params.ref_type == "genome") {
 	}
 }
  
-def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
-def local_modules = "${baseDir}/local_modules"
-def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'basecall_cpus')
-def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'demulti_cpus')
+def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
+def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
 def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 
-// Create a channel for tool options
-pars_tools = file(params.pars_tools)
-if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools'"
-
-def progPars = [:]
-def tooList = [:]
-allLines  = pars_tools.readLines()
-
-for( line : allLines ) {
-    list = line.split("\t")
-    if (list.length <3) {
-		 error "ERROR!!! Tool option file has to be tab separated\n" 
-	}
-    if (!(list[0] =~ /#/ )) {
-		progPars["${list[0]}--${list[1]}"] = list[2].replace("\"", "").replace('$baseDir', "${baseDir}").replace('${baseDir}', "${baseDir}")
-    }  
-}
 
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
+include { checkTools; reshapeSamples; reshapeDemuxSamples; getParameters } from "${local_modules}" 
+
+// Create a channel for tool options
+progPars = getParameters(params.pars_tools)
+
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
-include { extracting_demultiplexed_fastq; extracting_demultiplexed_fast5_deeplexicon; extracting_demultiplexed_fast5_guppy} from "${local_modules}" addParams(LABEL: 'big_cpus')
-include { FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
-include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"])
-include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"])
-include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"])
+include { GET_VERSION as DEMULTIPLEX_VER } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(GPU_OPTION: gpu)
+include { GET_VERSION as FILTER_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
+include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"], LABEL:'big_mem_cpus')
+include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"], LABEL:'big_mem_cpus')
+include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"], LABEL:'big_mem_cpus')
+include { GET_VERSION as GRAPHMAP_VER} from "${subworkflowsDir}/alignment/graphmap" 
+include { GET_VERSION as GRAPHMAP2_VER} from "${subworkflowsDir}/alignment/graphmap2" 
+include { GET_VERSION as MINIMAP2_VER} from "${subworkflowsDir}/alignment/minimap2" 
 include { FASTQCP as FASTQC} from "${subworkflowsDir}/qc/fastqc" addParams(LABEL: 'big_cpus')
-include { SORT as SAMTOOLS_SORT; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus', OUTPUT:outputMapping)
-include { CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
-include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" 
-include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
-include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts)
-include { REPORT as MULTIQC } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
-include { concatenateFastQFiles; MinIONQC; bam2stats; AssignReads; countStats; joinCountStats; joinAlnStats } from "${local_modules}"
+include { GET_VERSION as FASTQC_VER} from "${subworkflowsDir}/qc/fastqc"
+include { SORT as SAMTOOLS_SORT } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus', OUTPUT:outputMapping)
+include { INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(OUTPUT:outputMapping)
+include { GET_VERSION as SAMTOOLS_VERSION; CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
+include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus')
+include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot" 
+include { GET_VERSION as NANOCOUNT_VER ; COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
+include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts, LABEL:'big_cpus')
+include { GET_VERSION as HTSEQ_VER } from "${subworkflowsDir}/read_count/htseq" 
+include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
+include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
+include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_cpus')
+include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}" 
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
+include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
+
 
 
 /*
@@ -421,10 +415,10 @@ workflow preprocess_simple {
 		System.exit(0)
 	} 
 	
-	//fastqc_files.mix(map{it[1]}).set{qcs}
 
 	// Perform MULTIQC report
-	//MULTIQC(qcs.mix(stats_counts, stats_aln, Channel.from(logo)).collect())
+	fastqc_files.map{it[1]}.set{qcs}
+	MULTIQC(qcs.mix(stats_counts, stats_aln, Channel.from(logo)).collect())
 	
 }
 
@@ -487,6 +481,12 @@ workflow preprocess_simple {
 			System.exit(0)
  		
  	}
+
+	all_ver = DEMULTIPLEX_VER().mix(FILTER_VER())
+	.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
+	.mix(MINIMAP2_VER()).mix(FASTQC_VER())
+	.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
+	.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
  	
  
  }
@@ -528,44 +528,3 @@ else {
 }
 
 
-/*
-* FUNCTIONS
-*/
-
-def reshapeDemuxSamples(inputChannel) {
-	def reshapedChannel = inputChannel.map {
- 		def ids = it[0].split("---")
- 		def dems = it[0].split("\\.")
- 			["${ids[0]}---${dems[-1]}", it[1]]
-	 }
-	 return(reshapedChannel)
-}
-
-def reshapeSamples(inputChannel) {
-    def reshapedChannel = inputChannel.map{
-		def ids = it[0].split("---")
-		["${ids[0]}", it[1]]
-	}
-	return(reshapedChannel)
-}
-
-def checkTools(tool_names, tool_lists) {
-	println "----------------------CHECK TOOLS -----------------------------"
-	tool_names.each{ key, value -> 
-		if (value == "NO" ) {
-			println "> ${key} will be skipped"
-		} else {
-			def combid = "${key}--${value}".toString()
-			if (tool_lists.containsKey(combid)) {
-				println "${key} : ${value}"	
-			} else {
-				println "ERROR ################################################################"
-				println "${value} is not a valid program for ${key}"
-				println "ERROR ################################################################"
-				println "Exiting ..."
-				System.exit(0)
-			}
-		}
-	}
-	println "--------------------------------------------------------------"
-}
