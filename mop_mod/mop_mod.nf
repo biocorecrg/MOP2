@@ -272,7 +272,8 @@ workflow epinano_flow {
 		
 	main:	
 	indexes = indexReference(reference)
-	variants = callVariants(bams, reference.combine(indexes))
+	
+	variants = callVariants(bams.combine(reference.combine(indexes)))
 	per_site_vars = EPINANO_CALC_VAR_FREQUENCIES(variants).per_site_vars
 	per_site_vars.combine(per_site_vars).map {
 		[ it[0], it[2], it[1], it[3] ]

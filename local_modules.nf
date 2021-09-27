@@ -349,8 +349,7 @@ process callVariants {
     label (params.LABEL)
 	
     input:
-    tuple val(sampleID), path(alnfile) 
-    tuple path(reference), path(dict_index), path(faiidx) 
+    tuple val(sampleID), path(alnfile), path(reference), path(dict_index), path(faiidx) 
 
     output:
     tuple val(sampleID), path("${sampleID}.tsv")
