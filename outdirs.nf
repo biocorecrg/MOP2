@@ -6,7 +6,7 @@ outputFast5    = "${params.output}/fast5_files"
 outputQual     = "${params.output}/QC_files"
 outputMultiQC  = "${params.output}/report"
 outputMapping  = "${params.output}/alignment"
-//outputCRAM     = "${params.output}/cram_files"
+outputCRAM     = "${params.output}/cram_files"
 outputCounts   = "${params.output}/counts"
 //outputVars     = "${params.output}/variants"
 outputAssigned = "${params.output}/assigned"
@@ -19,7 +19,7 @@ outputTomboFlow      = "${params.output}/tombo_flow"
 // MOP_TAIL
 outputTailFindr     = "${params.output}/tailfindr_flow"
 outputNanopolish    = "${params.output}/nanopolish_flow"
-outputFinal         = "${params.output}/polya_common"
+outputFinalPolyA    = "${params.output}/polya_common"
 
 
 

@@ -265,7 +265,40 @@ process joinCountStats {
 		"""
 } 
 
-// MOP_MOD and MOP_TAIL
+ process bam2Cram {
+    tag "${idfile}"  
+    
+    publishDir(params.OUTPUT, mode:'copy') 
+    label (params.LABEL)
+
+    input:
+    path(reference)
+    val(subsampling_val)
+    tuple val(idfile), path(aln), path(index)
+    
+    output:
+    file("*.sorted.cram*") optional true 
+    
+    script:
+    def downcmd = ""
+    def input = aln
+    def perc = 0
+    def clean = ""
+ 	if (subsampling_val != "NO") {
+		perc = subsampling_val/100
+		downcmd = "samtools view -@ ${task.cpus} -bs ${perc} ${aln} > subsample.bam"
+		input = "subsample.bam"
+		clean = "rm subsample.bam"
+	}
+ 	"""
+ 		${downcmd}
+		samtools view  -@ ${task.cpus} -C ${input} -T ${reference} -o ${idfile}.sorted.cram
+		samtools index -@ ${task.cpus} ${idfile}.sorted.cram
+		${clean}
+    """
+}
+
+// COMMON TO ALL
 process checkRef {
     tag "Checking ${ reference }"
     label (params.LABEL)
@@ -283,9 +316,10 @@ process checkRef {
 	else 
         ln -s ${reference} reference.fa
 	fi
-	"""
-	
+	"""	
 }
+
+// MOP_MOD and MOP_TAIL
 
 process indexReference {
     label (params.LABEL)

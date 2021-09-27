@@ -50,6 +50,9 @@ mapping                   : ${params.mapping}
 
 counting                  : ${params.counting}
 
+cram_conv           	  : ${params.cram_conv}
+subsampling_cram		  : ${params.subsampling_cram}
+
 saveSpace   			  : ${params.saveSpace}
 
 email                     : ${params.email}
@@ -110,20 +113,20 @@ if (params.ref_type == "genome") {
  
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
+
 def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 
 
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
-include { checkTools; reshapeSamples; reshapeDemuxSamples; getParameters } from "${local_modules}" 
+include { checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
-include { DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
-include { GET_VERSION as DEMULTIPLEX_VER } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(GPU_OPTION: gpu)
+include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
 include { GET_VERSION as FILTER_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"], LABEL:'big_mem_cpus')
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"], LABEL:'big_mem_cpus')
@@ -136,7 +139,7 @@ include { GET_VERSION as FASTQC_VER} from "${subworkflowsDir}/qc/fastqc"
 include { SORT as SAMTOOLS_SORT } from "${subworkflowsDir}/misc/samtools" addParams(LABEL: 'big_cpus', OUTPUT:outputMapping)
 include { INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addParams(OUTPUT:outputMapping)
 include { GET_VERSION as SAMTOOLS_VERSION; CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
-include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus')
+include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus_ignore')
 include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot" 
 include { GET_VERSION as NANOCOUNT_VER ; COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts, LABEL:'big_cpus')
@@ -147,7 +150,7 @@ include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 
 include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}" 
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
-
+include { bam2Cram } from "${local_modules}" addParams(OUTPUT:outputCRAM, LABEL: 'big_cpus_ignore')
 
 
 /*
@@ -262,7 +265,6 @@ workflow preprocess_flow {
    			case "graphmap2": 
    			aln_reads = GRAPHMAP2(bc_fastq, reference)
    			case "minimap2": 
-   			break
    			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
    			default: 
@@ -285,6 +287,11 @@ workflow preprocess_flow {
 		sorted_alns = SAMTOOLS_SORT(jaln_reads)
 		aln_indexes = SAMTOOLS_INDEX(sorted_alns)
 
+		// Converting BAM to CRAM and 
+		if (params.cram_conv == "YES") {
+			good_ref = checkRef(reference)
+			bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
+		}
 		// OPTIONAL CLEANING BAM FILES
 		bamCleanFile(reshaped_aln_reads.groupTuple(), jaln_reads.map{it[1]}.collect(), ".bam")
 
@@ -362,7 +369,6 @@ workflow preprocess_simple {
    			case "graphmap2": 
    			aln_reads = GRAPHMAP2(bc_fastq, reference)
    			case "minimap2": 
-   			break
    			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
    			default: 
@@ -378,6 +384,12 @@ workflow preprocess_simple {
 		sorted_alns = SAMTOOLS_SORT(aln_reads)
 		aln_indexes = SAMTOOLS_INDEX(sorted_alns)
 
+		// Converting BAM to CRAM and 
+		if (params.cram_conv == "YES") {
+			good_ref = checkRef(reference)
+			bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
+		}
+		
 		// Perform bam2stats on sorted bams
 		aln_stats = bam2stats(sorted_alns)
 		stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
