@@ -1,4 +1,5 @@
 #step	tool	extrapars
+basecalling	guppy	""
 demultiplexing	deeplexicon	"-f multi -m $baseDir/deeplexicon/resnet20-final.h5"
 demultiplexing	guppy	"--barcode_kits EXP-NBD114"
 filtering	nanofilt	""

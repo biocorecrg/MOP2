@@ -1,0 +1,25 @@
+#Upload to biocorecrg/mop_consensus:0.1 
+FROM rocker/r-ver:4.1
+
+# File Author / Maintainer
+MAINTAINER Luca Cozzuto <lucacozzuto@gmail.com>
+ 
+ARG BEDTOOLS_VERSION=2.29.2
+
+RUN apt-get update
+RUN apt-get install -y zlib1g-dev curl libcurl4-openssl-dev libcurl4 libxml2-dev
+
+# Installing BEDTOOLS
+RUN bash -c 'curl -k -L https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static.binary > /usr/local/bin/bedtools'
+
+# installing R dependencies
+RUN Rscript -e "install.packages('RCurl', repos='http://cran.us.r-project.org')"
+RUN Rscript -e "install.packages('BiocManager')"
+RUN Rscript -e "BiocManager::install('GenomicRanges')"
+RUN Rscript -e "install.packages(c('plyr','dplyr','VennDiagram','ggplot2','argparse','stringr','scales','ggnewscale','ggrepel','gtable'), repos='http://cran.us.r-project.org')"
+RUN Rscript -e "install.packages('flexdashboard')"
+
+RUN chmod +x /usr/local/bin/bedtools
+ENV PATH /usr/local/bin/:$PATH
+
+

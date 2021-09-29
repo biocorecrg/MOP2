@@ -376,7 +376,7 @@ process makeEpinanoPlots {
        
     script:
 	"""
-	Rscript --vanilla ${epinanoScript} ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
+	Rscript --vanilla ${baseDir}/bin/epinano_scatterplot.R ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
 	"""
 }
 
@@ -515,7 +515,58 @@ process filter_bam {
 	"""
 }
 
+// MOP CONSENSUS
+process indexFasta {
+    label (params.LABEL)
 
+    tag "${reference}" 
+	
+    input:
+    path(reference)
+    
+    output:
+    stdout   
+       
+    script:
+	"""
+	samtools faidx ${reference}
+	cut -f 1,2 ${reference}.fai
+	"""
+}
+
+
+process nanoConsensus {
+	publishDir "${params.OUTPUT}/${sampleIDs}-${chrName}", mode: 'copy'
+	container "biocorecrg/mop_consensus:0.1"
+    label (params.LABEL)
+    errorStrategy 'ignore'
+
+    tag "${sampleIDs} on ${chrName}"  
+	
+    input:
+    path(nanoConScript)
+    path(nanoScripts)
+    path(reference)
+    tuple val(sampleIDs), path(Epi_Sample), path(Epi_IVT), path(NP_Sample), path(NP_IVT), path(Tombo), path(Nanocomp), val(chrName), val(chrStart), val(chrEnd)
+    
+    output:
+    path("*")
+       
+    script:
+	"""
+	Rscript --vanilla ${nanoConScript} -Epi_Sample ${Epi_Sample} \
+	 -Epi_IVT ${Epi_IVT} \
+	 -NP_Sample ${NP_Sample} \
+	 -NP_IVT ${NP_IVT} \
+	 -Tombo ${Tombo} \
+	 -Nanocomp ${Nanocomp} \
+	 -chr ${chrName} \
+	 -ini_pos ${chrStart} -fin_pos ${chrEnd} \
+	 -output ${sampleIDs} \
+	 -fasta ${reference} \
+	 --nanocomp_stat GMM_logit_pvalue 
+	"""
+}
 
 
 /*
