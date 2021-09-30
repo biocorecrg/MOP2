@@ -20,6 +20,10 @@ Subworkflows are stored in the independent repository [BioNextflow](https://gith
   * now you can launch each analysis independently
   * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare 
   * Fine tuning of parameter for each step in tools_opt.tsv
+
+* mop_consensus (new module!!)
+  This module will use the results fom mop_mod to generate a consensus between the 4 different tools (epinano, nanopolish, nanocompore and tombo model_sample_compare). It analyze each reference molecule independently and in parallel for each comparison.  
+
  
 
 ## Version 1.1
