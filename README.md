@@ -1,5 +1,5 @@
 # MoP2
-DLS2 version of master of pores
+DSL2 version of master of pores
 
 ## Install
 Please install nextflow and singularity or docker before.
