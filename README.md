@@ -1,6 +1,9 @@
 # MoP2
 DSL2 version of master of pores
 
+![MOP2](https://github.com/biocorecrg/MoP2/blob/master/img/master_red.jpg?raw=true)
+
+
 ## Install
 Please install nextflow and singularity or docker before.
 
