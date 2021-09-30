@@ -1,5 +1,4 @@
-# MoP2
-DSL2 version of master of pores
+# MoP2- DSL2 version of Master of Pores
 
 ![MOP2](https://github.com/biocorecrg/MoP2/blob/master/img/master_red.jpg?raw=true)
 
