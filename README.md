@@ -1,7 +1,9 @@
 # MoP2- DSL2 version of Master of Pores
 
 ![MOP2](https://github.com/biocorecrg/MoP2/blob/master/img/master_red.jpg?raw=true)
-Inspired from [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
+
+
+Inspired by Metallica's [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
 
 ## Install
 Please install nextflow and singularity or docker before.
