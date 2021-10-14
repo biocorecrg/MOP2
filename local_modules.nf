@@ -323,7 +323,7 @@ process checkRef {
 
 process indexReference {
     label (params.LABEL)
-    container 'biocorecrg/mopmod1:0.2'
+    container 'biocorecrg/mopmod:0.4'
     tag "Indexing ${ reference }"
 
     input:
@@ -343,9 +343,39 @@ process indexReference {
 * 
 */
 
+/*
+* CONCAT_EVENTS
+*/
+
+process mean_per_pos {
+
+    container 'biocorecrg/mopmod:0.4'
+    label (params.LABEL)
+    tag "${idsample}" 
+	
+    input:
+    tuple val(idsample), path(event_align) 
+    
+    output:
+    tuple val(idsample), path("*_processed_perpos_median.tsv.gz"), emit: cat_medians
+
+
+    script:
+    
+    """
+	mean_per_pos.py -i ${event_align} -o `basename ${event_align} .fast5_event_align.tsv.gz` -s 500000
+	gzip *_processed_perpos_median.tsv
+    """
+}
+
+
+/*
+*
+*/
+
 process callVariants {
     tag "${sampleID}" 
-    container 'biocorecrg/mopmod1:0.2'
+    container 'biocorecrg/mopmod:0.4'
     label (params.LABEL)
 	
     input:
@@ -381,7 +411,7 @@ process makeEpinanoPlots {
 }
 
 process multiToSingleFast5 {
-    container 'biocorecrg/mopmod1:0.2'
+    container 'biocorecrg/mopmod:0.4'
     label (params.LABEL)
 
     tag "${idsample}"  
@@ -405,7 +435,7 @@ process multiToSingleFast5 {
 *
 */
 process bedGraphToWig {
-    container 'biocorecrg/mopmod1:0.2'
+    container 'biocorecrg/mopmod:0.4'
     tag "${idsample}"  
 	
     input:
