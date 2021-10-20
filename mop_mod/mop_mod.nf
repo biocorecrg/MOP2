@@ -84,7 +84,7 @@ include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modifica
 include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore" 
 include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
 
-include { indexReference; callVariants; mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
+include { indexReference; callVariants; mean_per_pos; concat_mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
 include {  mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus} addParams(OUTPUT: outputTomboFlow) from "${local_modules}"
 include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } addParams(OUTPUT: outputEpinanoFlow) from "${local_modules}"
 
@@ -259,10 +259,12 @@ workflow compore_polish_flow {
 	
 	main:	
 		nanop_events = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
-		uff = mean_per_pos(nanop_events)
-		uff.view()
-		//combs_events = mapIDPairs(comparisons, concat_events)
-		//NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
+		mean_pps = mean_per_pos(nanop_events)
+		concat_mean = concat_mean_per_pos(mean_pps.groupTuple())
+		//concat_mean.view()
+		combs_events = mapIDPairs(comparisons, concat_mean)
+		//combs_events.view()
+		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
 	
 }
 

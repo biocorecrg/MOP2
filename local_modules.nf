@@ -323,7 +323,7 @@ process checkRef {
 
 process indexReference {
     label (params.LABEL)
-    container 'biocorecrg/mopmod:0.4'
+    container 'biocorecrg/mopmod:0.5'
     tag "Indexing ${ reference }"
 
     input:
@@ -344,12 +344,12 @@ process indexReference {
 */
 
 /*
-* CONCAT_EVENTS
+* CALC MEAN PER POSITION
 */
 
 process mean_per_pos {
 
-    container 'biocorecrg/mopmod:0.4'
+    container 'biocorecrg/mopmod:0.5'
     label (params.LABEL)
     tag "${idsample}" 
 	
@@ -357,14 +357,36 @@ process mean_per_pos {
     tuple val(idsample), path(event_align) 
     
     output:
-    tuple val(idsample), path("*_processed_perpos_median.tsv.gz"), emit: cat_medians
+    tuple val(idsample), path("*_perpos_median.parquete")
 
 
     script:
     
     """
 	mean_per_pos.py -i ${event_align} -o `basename ${event_align} .fast5_event_align.tsv.gz` -s 500000
-	gzip *_processed_perpos_median.tsv
+	#gzip *_processed_perpos_median.tsv
+    """
+}
+
+/*
+* CONCAT MEAN PER POS
+*/
+process concat_mean_per_pos {
+
+    container 'biocorecrg/mopmod:0.5'
+    label (params.LABEL)
+    tag "${idsample}" 
+	
+    input:
+    tuple val(idsample), path(event_align) 
+    
+    output:
+    tuple val(idsample), path("*")
+
+
+    script:
+    """
+	Merging_processed_nanopolish_data.py -i *.parquete -o ${idsample}
     """
 }
 
@@ -375,7 +397,7 @@ process mean_per_pos {
 
 process callVariants {
     tag "${sampleID}" 
-    container 'biocorecrg/mopmod:0.4'
+    container 'biocorecrg/mopmod:0.5'
     label (params.LABEL)
 	
     input:
@@ -411,7 +433,7 @@ process makeEpinanoPlots {
 }
 
 process multiToSingleFast5 {
-    container 'biocorecrg/mopmod:0.4'
+    container 'biocorecrg/mopmod:0.5'
     label (params.LABEL)
 
     tag "${idsample}"  
@@ -435,7 +457,7 @@ process multiToSingleFast5 {
 *
 */
 process bedGraphToWig {
-    container 'biocorecrg/mopmod:0.4'
+    container 'biocorecrg/mopmod:0.5'
     tag "${idsample}"  
 	
     input:
