@@ -200,7 +200,9 @@ workflow flow2 {
 				fast5_res = extracting_demultiplexed_fast5_deeplexicon(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
 				
 				// OPTIONAL CLEANING FASTQ5 FILES
-				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
+				if (params.saveSpace == "YES") {
+					fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
+				}
 			}
 		// Demultiplex fastq	
 			demufq = extracting_demultiplexed_fastq(demux.join(outbc.basecalled_fastq))
@@ -293,8 +295,9 @@ workflow preprocess_flow {
 			bam2Cram(good_ref, params.subsampling_cram, sorted_alns.join(aln_indexes))
 		}
 		// OPTIONAL CLEANING BAM FILES
-		bamCleanFile(reshaped_aln_reads.groupTuple(), jaln_reads.map{it[1]}.collect(), ".bam")
-
+		if (params.saveSpace == "YES") {
+			bamCleanFile(reshaped_aln_reads.groupTuple(), jaln_reads.map{it[1]}.collect(), ".bam")
+		}
 		// Perform bam2stats on sorted bams
 		aln_stats = bam2stats(sorted_alns)
 		stats_aln = joinAlnStats(aln_stats.map{ it[1]}.collect())
@@ -314,8 +317,9 @@ workflow preprocess_flow {
 	fastqc_files = FASTQC(fastq_files)
 
 	// OPTIONAL CLEANING FASTQC FILES
-	fastqCleanFile(reshaped_bc_fastq.groupTuple(), fastq_files.map{it[1]}.collect().mix(fastqc_files.map{it[1]}.collect(), jaln_reads.map{it[1]}.collect()).collect(), ".gz")
-	
+	if (params.saveSpace == "YES") {
+		fastqCleanFile(reshaped_bc_fastq.groupTuple(), fastq_files.map{it[1]}.collect().mix(fastqc_files.map{it[1]}.collect(), jaln_reads.map{it[1]}.collect()).collect(), ".gz")
+	}
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
 		read_counts = NANOCOUNT(sorted_alns)
@@ -324,7 +328,7 @@ workflow preprocess_flow {
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
 	}
 	else if (params.counting == "htseq" && params.ref_type == "genome") {
-		htseq_out = HTSEQ_COUNT(params.annotation, sorted_alns)
+		htseq_out = HTSEQ_COUNT(annotation, sorted_alns.join(aln_indexes))
 		read_counts = htseq_out.counts
 		assignments = AssignReads(htseq_out.bam, "htseq")
 		stat_counts = countStats(assignments)
@@ -342,8 +346,7 @@ workflow preprocess_flow {
 		System.exit(0)
 	} 
 	
-	fastqc_files.mix(basecall_qc).map{it[1]}.set{qcs}
-
+	fastqc_files.mix(basecall_qc).map{it[1]}.set{qcs}	
 	// Perform MULTIQC report
 	MULTIQC(qcs.mix(stats_counts, stats_aln, Channel.from(logo)).collect())
 	
@@ -409,7 +412,7 @@ workflow preprocess_simple {
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
 	}
 	else if (params.counting == "htseq" && params.ref_type == "genome") {
-		htseq_out = HTSEQ_COUNT(params.annotation, sorted_alns)
+		htseq_out = HTSEQ_COUNT(params.annotation, sorted_alns.join(aln_indexes))
 		read_counts = htseq_out.counts
 		assignments = AssignReads(htseq_out.bam, "htseq")
 		stat_counts = countStats(assignments)
@@ -430,7 +433,8 @@ workflow preprocess_simple {
 
 	// Perform MULTIQC report
 	fastqc_files.map{it[1]}.set{qcs}
-	MULTIQC(qcs.mix(stats_counts, stats_aln, Channel.from(logo)).collect())
+	all_res = qcs.mix(stats_counts, stats_aln, Channel.from(logo))
+	MULTIQC(all_res.collect())
 	
 }
 
