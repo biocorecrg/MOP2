@@ -251,7 +251,8 @@ workflow preprocess_flow {
     	
 	main:	
 	// Perform MinIONQC on basecalling stats
-	basecall_qc = MinIONQC(basecalled_stats.groupTuple())
+	basecall_qc = MinIONQC(basecalled_stats.groupTuple())	
+	multiqc_data = Channel.from(logo).mix(basecall_qc.QC_folder.map{it[1]})
 
 	// Perform mapping on fastq files
 	if (params.mapping == "NO") {
@@ -304,7 +305,7 @@ workflow preprocess_flow {
 	
 		// Perform NanoPlot on sorted bams
 		nanoplot_qcs = NANOPLOT_QC(sorted_alns)
-
+		multiqc_data = multiqc_data.mix(stats_aln)
 	}	
 
 	// Concatenate fastq files
@@ -315,6 +316,8 @@ workflow preprocess_flow {
 
 	// Perform fastqc QC on fastq
 	fastqc_files = FASTQC(fastq_files)
+	multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
+
 
 	// OPTIONAL CLEANING FASTQC FILES
 	if (params.saveSpace == "YES") {
@@ -326,6 +329,7 @@ workflow preprocess_flow {
 		assignments = AssignReads(sorted_alns, "nanocount")
 		stat_counts = countStats(assignments)
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
+		multiqc_data = multiqc_data.mix(stats_counts)
 	}
 	else if (params.counting == "htseq" && params.ref_type == "genome") {
 		htseq_out = HTSEQ_COUNT(annotation, sorted_alns.join(aln_indexes))
@@ -333,9 +337,8 @@ workflow preprocess_flow {
 		assignments = AssignReads(htseq_out.bam, "htseq")
 		stat_counts = countStats(assignments)
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
+		multiqc_data = multiqc_data.mix(stats_counts)
 	} else if (params.counting == "NO") {
-		// Default empty channels for reporting
-		stats_counts = Channel.value()
 	} else {
 		println "ERROR ################################################################"
 		println "${params.counting} is not compatible with ${params.ref_type}"
@@ -345,10 +348,8 @@ workflow preprocess_flow {
 		println "Exiting ..."
 		System.exit(0)
 	} 
-	
-	fastqc_files.mix(basecall_qc).map{it[1]}.set{qcs}	
 	// Perform MULTIQC report
-	MULTIQC(qcs.mix(stats_counts, stats_aln, Channel.from(logo)).collect())
+	MULTIQC(multiqc_data.collect())
 	
 }
 
@@ -358,6 +359,10 @@ workflow preprocess_simple {
     	bc_fastq
     	
 	main:	
+
+	// Perform Fastqc QC on fastq
+	fastqc_files = FASTQC(bc_fastq)
+
 	// Perform mapping on fastq files
 	if (params.mapping == "NO") {
 		stats_aln = Channel.value()	
@@ -401,9 +406,7 @@ workflow preprocess_simple {
 		nanoplot_qcs = NANOPLOT_QC(sorted_alns)
 	}	
 
-	// Perform fastqc QC on fastq
-	fastqc_files = FASTQC(bc_fastq)
-	
+
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
 		read_counts = NANOCOUNT(sorted_alns)

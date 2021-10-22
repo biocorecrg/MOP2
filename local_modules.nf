@@ -136,8 +136,8 @@ process MinIONQC {
     tuple val(folder_name), path("summaries_*") 
 
     output:
-    tuple val(folder_name), path ("${folder_name}_QC")
-    tuple val(folder_name), path ("*_summary.stats")
+    tuple val(folder_name), path ("${folder_name}_QC"), emit: QC_folder 
+    tuple val(folder_name), path ("*_summary.stats"), emit: stats 
 
     script:
     """
