@@ -1,13 +1,13 @@
-title: "Master of Pores"
+title: "MoP2 - pipeline"
 subtitle: ""
 intro_text: False
 
 report_header_info:
-    - Application Type: 'Nanopore sequencing'
+    - Please cite: "Cozzuto L, Liu H, Pryszcz LP, Pulido TH, Delgado-Tejedor A, Ponomarenko J, Novoa EM. MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets. Front Genet. 2020 Mar 17;11:211. doi: 10.3389/fgene.2020.00211"
 
 custom_logo: 'logo_small.png'
-custom_logo_url: 'https://github.com/biocorecrg/nanopore_analysis'
-custom_logo_title: 'Master of Pores'
+custom_logo_url: 'https://github.com/biocorecrg/MoP2'
+custom_logo_title: 'Master of Pores 2'
 
 extra_fn_clean_trim: 
    - '_QC'
