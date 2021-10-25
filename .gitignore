@@ -1,3 +1,4 @@
+data*
 singularity
 mop_preprocess/bin/multi_to_single_fast5
 mop_preprocess/bin/read_fast5_basecaller.py

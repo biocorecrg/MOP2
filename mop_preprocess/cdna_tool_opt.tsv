@@ -1,9 +1,10 @@
 #step	tool	extrapars
 basecalling	guppy	""
-demultiplexing	guppy	"--barcode_kits EXP-NBD114"
+demultiplexing	guppy	"--barcode_kits EXP-NBD104"
 filtering	nanofilt	""
 mapping	graphmap	""
 mapping	graphmap2	"-x rnaseq"
 mapping	minimap2	"-uf -ax splice -k14"
 counting	htseq	"-a 0"
 counting	nanocount	""
+discovery	bambu	""

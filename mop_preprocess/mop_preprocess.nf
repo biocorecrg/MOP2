@@ -49,9 +49,11 @@ filtering                 : ${params.filtering}
 mapping                   : ${params.mapping}
 
 counting                  : ${params.counting}
+discovery				  : ${params.discovery}
 
 cram_conv           	  : ${params.cram_conv}
 subsampling_cram		  : ${params.subsampling_cram}
+
 
 saveSpace   			  : ${params.saveSpace}
 
@@ -76,7 +78,7 @@ reference = file(params.reference)
 if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
-logo = file("$baseDir/../img/logo_small.png")
+logo = file("$baseDir/img/logo_small.png")
 
 def gpu				    = params.GPU
 
@@ -86,6 +88,7 @@ tools["demultiplexing"] = params.demultiplexing
 tools["mapping"] = params.mapping
 tools["filtering"] = params.filtering
 tools["counting"] = params.counting
+tools["discovery"] = params.discovery
 //tools["variantcall"] = params.variantcall
 
 // Output files
@@ -144,6 +147,11 @@ include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot"
 include { GET_VERSION as NANOCOUNT_VER ; COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts, LABEL:'big_cpus')
 include { GET_VERSION as HTSEQ_VER } from "${subworkflowsDir}/read_count/htseq" 
+
+include { GET_VERSION as BAMBU_VER } from "${subworkflowsDir}/assembly/bambu" 
+include { ASSEMBLE as BAMBU_ASSEMBLE } from "${subworkflowsDir}/assembly/bambu" addParams(EXTRAPARS: progPars["discovery--bambu"], OUTPUT:outputAssembly, LABEL:'big_mem_cpus')
+
+
 include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
 include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_cpus')
@@ -318,7 +326,6 @@ workflow preprocess_flow {
 	fastqc_files = FASTQC(fastq_files)
 	multiqc_data = multiqc_data.mix(fastqc_files.map{it[1]})
 
-
 	// OPTIONAL CLEANING FASTQC FILES
 	if (params.saveSpace == "YES") {
 		fastqCleanFile(reshaped_bc_fastq.groupTuple(), fastq_files.map{it[1]}.collect().mix(fastqc_files.map{it[1]}.collect(), jaln_reads.map{it[1]}.collect()).collect(), ".gz")
@@ -348,6 +355,25 @@ workflow preprocess_flow {
 		println "Exiting ..."
 		System.exit(0)
 	} 
+	
+	if (params.discovery == "bambu" && params.ref_type == "genome"){
+		
+		sorted_alns.map{
+			[it[1]]
+		}.collect().map{
+			["assembly", it]
+		}.set{data_to_bambu}
+		bambu_out = BAMBU_ASSEMBLE(reference, annotation, data_to_bambu)
+	} else if (params.counting == "NO") {
+	} else {
+		println "ERROR ################################################################"
+		println "${params.discovery} is not compatible with ${params.ref_type}"
+		println "bambu requires a genome as reference and an annotation in GTF"
+		println "ERROR ################################################################"
+		println "Exiting ..."
+		System.exit(0)
+	}
+	
 	// Perform MULTIQC report
 	MULTIQC(multiqc_data.collect())
 	
@@ -420,7 +446,8 @@ workflow preprocess_simple {
 		assignments = AssignReads(htseq_out.bam, "htseq")
 		stat_counts = countStats(assignments)
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
-	} else if (params.counting == "NO") {
+	} 
+	else if (params.counting == "NO") {
 		// Default empty channels for reporting
 		stats_counts = Channel.value()
 	} else {
