@@ -8,6 +8,8 @@ outputMultiQC  = "${params.output}/report"
 outputMapping  = "${params.output}/alignment"
 outputCRAM     = "${params.output}/cram_files"
 outputCounts   = "${params.output}/counts"
+outputAssembly = "${params.output}/assembly"
+
 //outputVars     = "${params.output}/variants"
 outputAssigned = "${params.output}/assigned"
 
