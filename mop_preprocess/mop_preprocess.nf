@@ -76,7 +76,7 @@ reference = file(params.reference)
 if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
-logo = file("$baseDir/img/logo_small.png")
+logo = file("$baseDir/../img/logo_small.png")
 
 def gpu				    = params.GPU
 
