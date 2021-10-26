@@ -257,9 +257,9 @@ process joinCountStats {
 	
 	script:
 	"""
-	echo '# id: Read counts
+	echo '# id: Assigned reads
 	# plot_type: \'table\'
-	# section_name: Read counts 
+	# section_name: Assigned counts 
 	File name	\'Counts\' ' > counts_mqc.txt 
 		cat stats_*  >> counts_mqc.txt 
 		"""
