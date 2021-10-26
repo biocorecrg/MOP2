@@ -35,7 +35,7 @@ RUN bash -c 'curl -k -L https://github.com/broadinstitute/picard/releases/downlo
 RUN bash -c 'curl -k -L https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static.binary > /usr/local/bin/bedtools'
 RUN chmod +x /usr/local/bin/bedtools
 
-RUN pip install h5py
+RUN pip install h5py pandas pyarrow
 
 # Clean cache
 RUN yum clean all 
