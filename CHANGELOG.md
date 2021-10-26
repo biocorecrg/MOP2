@@ -10,10 +10,15 @@ Subworkflows are stored in the independent repository [BioNextflow](https://gith
   * demultiplexing, filtering, mapping and counting can be switched off by setting "NO" as a parameter
   * saveSpace can be set to "YES" to reduce the amount of disk space required. WARNING This will prevent the possibility to resume!
   * Merged old NanoPreprocess and NanoPreprocessSimple in a mop_preprocess. Using fastq or fast5 will switch among the two executions.
+  * Added new process "discovery" with bambu / ... for discovering and quantifying new transcripts.  
 
 * mop_mod (formerly known as nanoMod)
   * now you can launch each analysis independently
-  * 4 workflows: epinano, nanopolish + nanocompore, tombo model_sample_compare and tombo level_sample_compare 
+  * 4 workflows based on the following tools: 
+    * epinano
+    * nanopolish + nanocompore
+    * tombo model_sample_compare
+    * tombo level_sample_compare 
   * Fine tuning of parameter for each step in tools_opt.tsv
 
 * mop_tail (formerly known as nanoTail)
@@ -22,7 +27,7 @@ Subworkflows are stored in the independent repository [BioNextflow](https://gith
   * Fine tuning of parameter for each step in tools_opt.tsv
 
 * mop_consensus (new module!!)
-  This module will use the results fom mop_mod to generate a consensus between the 4 different tools (epinano, nanopolish, nanocompore and tombo model_sample_compare). It analyze each reference molecule independently and in parallel for each comparison.  
+  This module will use the results from mop_mod using the tools from the 4 workflows (epinano, nanopolish, nanocompore and tombo model_sample_compare) to generate a consensus between them . It analyze each reference molecule independently and in parallel for each comparison.  
 
  
 
