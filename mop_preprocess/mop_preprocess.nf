@@ -275,6 +275,7 @@ workflow preprocess_flow {
    			break
    			case "graphmap2": 
    			aln_reads = GRAPHMAP2(bc_fastq, reference)
+   			break
    			case "minimap2": 
    			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
