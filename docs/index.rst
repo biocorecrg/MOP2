@@ -4,8 +4,6 @@
 Welcome to the documentation of Master Of Pores
 *******************
 
-`Doc pages <https://biocorecrg.github.io/MoP2/docs/>`_
-
 .. image:: ../img/master_red.jpg
   :width: 400
   
