@@ -26,4 +26,9 @@ Contents:
 
    about
    install
+   mop_preprocess
+   mop_mod
+   mop_consensus
+   mop_tail
+   
 
