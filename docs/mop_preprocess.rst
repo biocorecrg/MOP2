@@ -15,124 +15,123 @@ Input Parameters
 
 | Parameter name  | Description |
 | ------------- | --------------|
-|**fast5 files**|Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&ast&ast/*.fast5]**|
-|**reference**|File in fasta format. **[Reference_file.fa]**|
-|**ref_type**| Specify if the reference is a genome or a transcriptome. **[genome / transcriptome]** |
 |**kit**|Kit used in library prep - required for basecalling.|
 |**flowcell**|Flowcell used in sequencing - required for basecalling. |
-|**annotation**|Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. **[Annotation_file.gtf]** |
-|**seq_type**| Sequence type. **[RNA / DNA]** |
+|**fast5 files**|Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&ast&ast/*.fast5]**. If empty it will search for fastq files and skip basecalling|
+|**fastq files**|Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling**[/Path/&ast&ast/*.fastq]**. |
+|**reference**|File in fasta format. **[Reference_file.fa]**|
+|**ref_type**| Specify if the reference is a genome or a transcriptome. **[genome / transcriptome]** |
+|**annotation**|Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. |
+|**pars_tools**|Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**|
 |**output**|Output folder name. **[/Path/to_output_folder]**|
-|**granularity**|indicates the number of input fast5 files analyzed in a single process. It is by default 4000 for single-sequence fast5 files and 1 for multi-sequence fast5 files. In case **GPU** option is turned on this value is not needed since every file will be analyzed sequentially.|
-|**basecaller**|Algorithm to perform the basecalling. guppy or albacore are supported. **[albacore / guppy]**|
-|**basecaller_opt**| Command line options for basecaller program. Check available options in respective basecaller repository.|
+|**qualityqc**|Quality threshold for QC. **[5]**|
+|**granularity**|indicates the number of input fast5 files analyzed in a single process.|
+|**basecalling**|Tool for basecalling **[guppy / NO ]**|
 |**GPU**| Allow the pipeline to run with GPU. **[OFF / ON]**|
-|**demultiplexing**| Demultiplexing algorithm to be used. **[OFF / deeplexicon / guppy / guppy-readucks]**|
-|**demultiplexing_opt**|Command line options for the demultiplexing software. |
-|**demulti_fast5**| If performing demultiplexing, also generate demultiplexed multifast5 files. **[OFF / ON]**|
-|**filter**| Program to filter fastq files. **[nanofilt / OFF]**|
-|**filter_opt**| Command line options of the filtering program. |
-|**mapper**| Mapping algorithm. **[minimap2 / graphmap / graphmap2]** |
-|**mapper_opt**| Command line options of the mapping algorithm. |
-|**map_type**|Spliced - recommended for genome mapping - or unspliced - recommended for transcriptome mapping. **[spliced / unspliced]**|
-|**counter**| Generating gene counts (genome mapping) or transcript counts (transcriptome mapping). **[YES / ""]**|
-|**counter_opt**|Command line options of the counter program: NanoCount for transcripts and Htseq-count for genes.|
+|**demultiplexing**| Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**|
+|**demulti_fast5**| If performing demultiplexing, also generate demultiplexed multifast5 files. **[YES / NO]**|
+|**filtering**| Tool for filtering fastq files. **[nanofilt / NO]**|
+|**mapping**| Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]** |
+|**counting**| Tool for gene or transcripts counts **[htseq / nanocount / NO""]**|
+|**discovery**| Tool for generating novel transcripts. **[bambu / isoquant / NO]** |
+|**cram_conv**| Converting bam in cram. **[YES / ""]**|
+|**subsampling_cram**| Subsampling BAM before CRAM conversion. **[YES / ""]**|
+|**saveSpace**| Remove intermediate files (**beta**) **[YES / ""]**|
 |**email**| Users email for receving the final report when the pipeline is finished. **[user_email]**|
 
 
 You can change them by editing the **params.config** file or using the command line - please, see next section. 
 
-## How to run the pipeline
+How to run the pipeline
+=============================
+
 Before launching the pipeline, user should decide which containers to use - either docker or singularity **[-with-docker / -with-singularity]**.
+
 Then, to launch the pipeline, please use the following command:
-```bash
-nextflow run nanopreprocess.nf -with-singularity > log.txt
-```
-<br/>
+.. code-block:: console
 
-* Run the pipeline in the background:
-```bash
-nextflow run nanopreprocess.nf -with-singularity -bg > log.txt
-```
-<br/>
+   nextflow run mop_preprocess.nf -with-singularity > log.txt
 
-* Run the pipeline while changing **params.config** file:
-```bash
-nextflow run nanopreprocess.nf -with-singularity -bg --output test2 > log.txt
-```
-<br/>
 
-* Specify a directory for the working directory (temporary files location):
-```bash
-nextflow run nanopreprocess.nf -with-singularity -bg -w /path/working_directory > log.txt
-```
-<br/>
+You can run the pipeline in the background adding the nextflow parameter **-bg**:
 
-* Run the pipeline with GPU - **CRG GPU cluster users**
-```bash
-nextflow run nanopreprocess.nf -with-singularity -bg -w /path/working_directory -profile cluster > log.txt
-```
-<br/>
+.. code-block:: console
 
-* Run the pipeline with GPU - **local GPU** 
-```bash
-nextflow run nanopreprocess.nf -with-singularity -bg -w /path/working_directory -profile local > log.txt
-```
+   nextflow run mop_preprocess.nf -with-singularity -bg > log.txt
 
-## Troubleshooting
-* Checking what has gone wrong:  
-If there is an error, please see the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory and check both the `.command.log` and `.command.err` files. 
-<br/>
+You can change the parameters either by changing **params.config** file or by feeding the parameters via command line:
 
-* Resume an execution:  
-Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **-resume** (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest. If a parameter was changed, only processes affected by this parameter will be re-run. 
+.. code-block:: console
 
-```bash
-nextflow run nanopreprocess.nf -with-singularity -bg -resume > log_resumed.txt
-```
+   nextflow run mop_preprocess.nf -with-singularity -bg --output test2 > log.txt
 
-To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as *Cached*, resume worked!
-```
-...
 
-[warm up] executor > crg
-[e8/2e64bd] Cached process > baseCalling (RNA081120181_1)
-[b2/21f680] Cached process > QC (RNA081120181_1)
-[c8/3f5d17] Cached process > mapping (RNA081120181_1)
-...
+You can specify a different working directory with temporary files:
 
-```
+.. code-block:: console
 
-**IMPORTANT:** To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning. 
+   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory > log.txt
 
-## Results:
+You can use different profiles specifying the different environments. We have one set up for HPC using the SGE scheduler:
 
-Several folders are created by the pipeline within the output directory specified by the **output** parameter and the input folder name is taken as sample name. 
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile cluster > log.txt
+
+or you can run the pipeline locally:
+
+.. code-block:: console
+
+   nextflow run mop_preprocess.nf -with-singularity -bg -w /path/working_directory -profile local > log.txt
+
+
+.. note::
+ 
+   * In case of errors you can troubleshoot seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory indicated by the error output and check both the `.command.log` and `.command.err` files. 
+
+
+.. tip::
+
+   Once the error has been solved or if you change a specific parameter, you can resume the execution with the **Netxtlow** parameter **- resume** (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest.    If a parameter was changed, only processes affected by this parameter will be re-run. 
+
+
+.. code-block:: console
+   nextflow run mop_preprocess.nf -with-singularity -bg -resume > log_resumed.txt
+
+   To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as   *Cached*, resume worked!
+
+.. code-block:: console
+
+   ...
+
+   [warm up] executor > crg
+   [e8/2e64bd] Cached process > baseCalling (RNA081120181_1)
+   [b2/21f680] Cached process > QC (RNA081120181_1)
+   [c8/3f5d17] Cached process > mapping (RNA081120181_1)
+   ...
+
+
+.. note::
+   To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning. 
+
+Results
+====================
+
+Several folders are created by the pipeline within the output directory specified by the **output** parameter:
+
 
 * **fast5_files**: Contains the basecalled multifast5 files. Each batch contains 4000 sequences. 
 * **fastq_files**: Contains one or, in case of demultiplexing, more fastq files.
 * **QC_files**: Contains each single QC produced by the pipeline.
 * **alignment**: Contains the bam file(s).
 * **cram_files**: Contains the cram file(s).
-* **counts (OPTIONAL)**: Contains read counts per gene / transcript if counting was performed.
-* **assigned (OPTIONAL)**: Contains assignment of each read to a given gene / transcript if counting was performed.
+* **counts**: Contains read counts per gene / transcript if counting was performed.
+* **assigned**: Contains assignment of each read to a given gene / transcript if counting was performed.
 * **report**: Contains the final multiqc report. 
-* **variants (OPTIONAL)**: still experimental. It contains variant calling. 
-
------------------------------------------------------
+* **assembly**: It contains assembled transcripts.
 
 
-# NanoPreprocessSimple
 
-This is a light version of NanoPreprocess that does not perform the basecalling step. It allows to make the same analysis starting from basecalled reads in fastq format. You can also provide fast5 files if you need to demultiplex using DeepLexiCon.
-
-This module will allow to run the pipeline on multiple input samples by using this syntax in the params.file:
-
-```bash
-fastq               = "$baseDir/../../../org_data/**/*.fastq.gz"
-```
-
-In this way it will produces a number of output files with the same sample name indicated by the two asterisks.
 
 
 
