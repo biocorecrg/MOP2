@@ -7,6 +7,12 @@ About Master of Pores
 .. autosummary::
    :toctree: generated
 
+Master of Pores is a pipeline writte in Nextflow DSL2 for the analysis of Nanopore data. It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
+
+The name is inspired by Metallica's `Master Of Puppets <https://www.youtube.com/watch?v=S7blkui3nQc>`_
+
+.. image:: ../img/master_red.jpg
+  :width: 400  
 
 This is a joint project between `CRG bioinformatics core <https://biocore.crg.eu/>`_ and `Epitranscriptomics and RNA Dynamics research group <https://public-docs.crg.es/enovoa/public/website/index.html>`_.
 
