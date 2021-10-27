@@ -1,12 +1,9 @@
-.. _home-page:
+.. _home-page-about:
 
 *******************
-Welcome to the documentation of Master Of Pores
+About Master of Pores
 *******************
 
-.. image:: ../img/master_red.jpg
-  :width: 400
-  
 
 This is a joint project between `CRG bioinformatics core <https://biocore.crg.eu/>`_ and `Epitranscriptomics and RNA Dynamics research group <https://public-docs.crg.es/enovoa/public/website/index.html>`_.
 
@@ -19,11 +16,4 @@ Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-T
 Front. Genet., 17 March 2020. <https://doi.org/10.3389/fgene.2020.00211](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full>__`
 
 
-Contents:
-
-.. toctree::
-   :maxdepth: 1
-
-   about
-   install
 
