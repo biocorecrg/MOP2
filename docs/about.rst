@@ -4,11 +4,16 @@
 About Master of Pores
 *******************
 
+.. autosummary::
+   :toctree: generated
+
 
 This is a joint project between `CRG bioinformatics core <https://biocore.crg.eu/>`_ and `Epitranscriptomics and RNA Dynamics research group <https://public-docs.crg.es/enovoa/public/website/index.html>`_.
 
 
-## Reference
+Reference
+======================
+
 If you use this tool, please cite our paper:
 
 `MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets"
