@@ -17,8 +17,8 @@ Input Parameters
    :widths: 25 75
    :header-rows: 1
 
-   * - Parameter name, Description
-   * - **kit**, Kit used in library prep - required for basecalling
+	* - Parameter name, Description
+	* - **kit**, Kit used in library prep - required for basecalling
 	* - **flowcell**, Flowcell used in sequencing - required for basecalling. 
 	* - **fast5 files**, Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&ast&ast/*.fast5]**. If empty it will search for fastq files and skip basecalling
 	* - **fastq files**, Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling**[/Path/&ast&ast/*.fastq]**. 
