@@ -4,6 +4,9 @@
 How to install
 **************
 
+.. autosummary::
+   :toctree: generated
+
 
 Please install nextflow `**Nextflow** <https://www.nextflow.io/>`_ and `**Singularity** <https://sylabs.io/>`_or `**Docker** <https://www.docker.com/>` before.
 
