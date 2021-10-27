@@ -1,6 +1,6 @@
 # Install
 
-Please install nextflow and singularity or docker before.
+Please install nextflow `**Nextflow** <https://www.nextflow.io/>`_ and `**Singularity** <https://sylabs.io/>`_or `**Docker** <https://www.docker.com/>` before.
 
 Then download the repo:
 
