@@ -1,4 +1,9 @@
-# Install
+.. _home-page-install:
+
+**************
+How to install
+**************
+
 
 Please install nextflow `**Nextflow** <https://www.nextflow.io/>`_ and `**Singularity** <https://sylabs.io/>`_or `**Docker** <https://www.docker.com/>` before.
 
@@ -21,7 +26,8 @@ You can use **INSTALL.sh** to download the **guppy 3.4.5** or you can replace it
   cd MoP2; sh INSTALL.sh
 
 
-## Testing
+Testing
+============
 
 .. code-block:: console
 
