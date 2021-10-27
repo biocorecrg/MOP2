@@ -1,4 +1,4 @@
-.. _home-page:
+.. _home-page-index:
 
 *******************
 Welcome to the documentation of Master Of Pores
@@ -11,7 +11,7 @@ Welcome to the documentation of Master Of Pores
 .. image:: ../img/master_red.jpg
   :width: 400  
 
-This is a joint project between `CRG bioinformatics core <https://biocore.crg.eu/>`_ and `Epitranscriptomics and RNA Dynamics research group <https://public-docs.crg.es/enovoa/public/website/index.html>`_.
+Master of Pores is a pipeline writtein in Nextflow DSL2 for the analysis of Nanopore data. It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.
 
 
 .. MoP2 documentation master file, created by
