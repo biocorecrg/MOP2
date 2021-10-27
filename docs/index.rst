@@ -22,8 +22,5 @@ Contents:
    :maxdepth: 1
 
    about
-   first
-   second
-   third
-   fourth
+   install
 
