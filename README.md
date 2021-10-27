@@ -28,3 +28,7 @@ cd mop_preprocess
 nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
 
 ```
+
+## Documentation
+
+In progress... [here](https://biocorecrg.github.io/MoP2/docs/)
