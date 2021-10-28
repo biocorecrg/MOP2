@@ -31,10 +31,10 @@ Input Parameters
    :widths: 25 75
    :header-rows: 1
 
-	* - Parameter name
-	  - Description
-	* - **kit**
-	  - Kit used in library prep - required for basecalling
+   * - Parameter name
+     - Description
+   * - **kit**
+     - Kit used in library prep, required for basecalling
 	  
 
 
