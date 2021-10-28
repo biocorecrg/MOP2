@@ -1,0 +1,33 @@
+params {
+    kit                 = "SQK-RNA002"
+    flowcell            = "FLO-MIN106"
+    fast5               = "$baseDir/../data/**/*.fast5"
+    fastq               = ""
+
+    reference           = "$baseDir/../anno/curlcake_constructs.fasta.gz"
+    annotation          = ""
+    ref_type            = "transcriptome"
+
+    pars_tools          = "drna_tool_splice_opt.tsv" 
+    output              = "$baseDir/output"
+    qualityqc           = 5
+    granularity         = 1
+
+    basecalling         = "guppy"
+    GPU                 = "OFF"
+    demultiplexing      = "NO"
+    demulti_fast5       = "NO" 
+
+    filtering           = "NO"
+
+    mapping             = "graphmap"
+    counting            = "nanocount"
+    discovery           = "NO"
+
+    cram_conv           = "YES"
+    subsampling_cram    = 50
+
+    saveSpace           = "NO"
+
+    email               = ""
+}
