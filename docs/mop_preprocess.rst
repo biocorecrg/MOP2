@@ -33,30 +33,69 @@ Input Parameters
    :widths: 25 75
    :header-rows: 1
 
-	* - Parameter name, Description
-	* - **kit**, Kit used in library prep - required for basecalling
-	* - **flowcell**, Flowcell used in sequencing - required for basecalling. 
-	* - **fast5 files**, Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&ast&ast/*.fast5]**. If empty it will search for fastq files and skip basecalling
-	* - **fastq files**, Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling**[/Path/&ast&ast/*.fastq]**. 
-	* - **reference**, File in fasta format. **[Reference_file.fa]**, 
-	* - **ref_type**,  Specify if the reference is a genome or a transcriptome. **[genome / transcriptome]** 
-	* - **annotation**, Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. 
-	* - **pars_tools**, Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**, 
-	* - **output**, Output folder name. **[/Path/to_output_folder]**, 
-	* - **qualityqc**, Quality threshold for QC. **[5]**, 
-	* - **granularity**, indicates the number of input fast5 files analyzed in a single process.
-	* - **basecalling**, Tool for basecalling **[guppy / NO ]**, 
-	* - **GPU**,  Allow the pipeline to run with GPU. **[OFF / ON]**, 
-	* - **demultiplexing**,  Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**, 
-	* - **demulti_fast5**,  If performing demultiplexing, also generate demultiplexed multifast5 files. **[YES / NO]**, 
-	* - **filtering**,  Tool for filtering fastq files. **[nanofilt / NO]**, 
-	* - **mapping**,  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]** 
-	* - **counting**,  Tool for gene or transcripts counts **[htseq / nanocount / NO""]**, 
-	* - **discovery**,  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
-	* - **cram_conv**,  Converting bam in cram. **[YES / ""]**, 
-	* - **subsampling_cram**,  Subsampling BAM before CRAM conversion. **[YES / ""]**, 
-	* - **saveSpace**,  Remove intermediate files (**beta**) **[YES / ""]**, 
-	* - **email**,  Users email for receving the final report when the pipeline is finished. **[user_email]**, 
+	* - Parameter name
+	- Description
+	* - **kit**
+	- Kit used in library prep - required for basecalling
+	* - **flowcell**
+	- Flowcell used in sequencing - required for basecalling. 
+	* - **fast5 files**
+	- Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&ast&ast/*.fast5]**. If empty it will search for fastq files and skip basecalling
+	* - **fastq files**
+	- Path to fastq input files. They should be inside folders that will be used as sample name. Must be empty if you want to perform basecalling**[/Path/&ast&ast/*.fastq]**. 
+	* - **reference**
+	- File in fasta format. **[Reference_file.fa]**
+	- 
+	* - **ref_type**
+	-  Specify if the reference is a genome or a transcriptome. **[genome / transcriptome]** 
+	* - **annotation**
+	- Annotation file in GTF format. It is optional and needed only in case of mapping to the genome and when interested in gene counts. Can be gzipped. **[Annotation_file.gtf]**. 
+	* - **pars_tools**
+	- Parameters of tools. It is ha tab separated file with custom parameters for each tool **[NAME_tool_opt.tsv]**
+	- 
+	* - **output**
+	- Output folder name. **[/Path/to_output_folder]**
+	- 
+	* - **qualityqc**
+	- Quality threshold for QC. **[5]**
+	- 
+	* - **granularity**
+	- indicates the number of input fast5 files analyzed in a single process.
+	* - **basecalling**
+	- Tool for basecalling **[guppy / NO ]**
+	- 
+	* - **GPU**
+	-  Allow the pipeline to run with GPU. **[OFF / ON]**
+	- 
+	* - **demultiplexing**
+	-  Tool for demultiplexing algorithm. **[deeplexicon / guppy / NO ]**
+	- 
+	* - **demulti_fast5**
+	-  If performing demultiplexing
+	- also generate demultiplexed multifast5 files. **[YES / NO]**
+	- 
+	* - **filtering**
+	-  Tool for filtering fastq files. **[nanofilt / NO]**
+	- 
+	* - **mapping**
+	-  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]** 
+	* - **counting**
+	-  Tool for gene or transcripts counts **[htseq / nanocount / NO""]**
+	- 
+	* - **discovery**
+	-  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
+	* - **cram_conv**
+	-  Converting bam in cram. **[YES / ""]**
+	- 
+	* - **subsampling_cram**
+	-  Subsampling BAM before CRAM conversion. **[YES / ""]**
+	- 
+	* - **saveSpace**
+	-  Remove intermediate files (**beta**) **[YES / ""]**
+	- 
+	* - **email**
+	-  Users email for receving the final report when the pipeline is finished. **[user_email]**
+	- 
 
 
 You can change them by editing the **params.config** file or using the command line - please, see next section. 
