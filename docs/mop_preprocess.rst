@@ -33,8 +33,8 @@ Input Parameters
 
    * - Parameter name
      - Description
-   * - **kit**
-     - Kit used in library prep, required for basecalling
+   * - **--kit**
+     - kit used in library prep, required for basecalling
 	  
 
 
