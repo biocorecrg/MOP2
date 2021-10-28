@@ -10,8 +10,8 @@ CHANGELOG
 Version 2.0
 ================
 
-Completely rewritten using the powerful [DSL2](https://www.nextflow.io/docs/latest/dsl2.html).
-Subworkflows are stored in the independent repository [BioNextflow](https://github.com/biocorecrg/BioNextflow).
+Completely rewritten using the powerful `DSL2 <https://www.nextflow.io/docs/latest/dsl2.html>`__.
+Subworkflows are stored in the independent repository `BioNextflow <https://github.com/biocorecrg/BioNextflow>`__.
 
 * mop_preprocess (formerly known as nanoPreprocess + nanoPreprocessSimple)
   * now can read multiple runs per time
@@ -59,4 +59,4 @@ Version 1.1
 Version 1.0
 ================
 
-This is the original version published in the paper [MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full)
+This is the original version published in the paper `MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets <https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full>`__
