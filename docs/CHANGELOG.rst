@@ -1,4 +1,15 @@
-## Version 2.0
+.. _home-page-changelog:
+
+**************
+CHANGELOG
+**************
+
+.. autosummary::
+   :toctree: generated
+
+Version 2.0
+================
+
 Completely rewritten using the powerful [DSL2](https://www.nextflow.io/docs/latest/dsl2.html).
 Subworkflows are stored in the independent repository [BioNextflow](https://github.com/biocorecrg/BioNextflow).
 
@@ -31,7 +42,9 @@ Subworkflows are stored in the independent repository [BioNextflow](https://gith
 
  
 
-## Version 1.1
+Version 1.1
+=================
+
 * Added a new module called NanoPreprocessSimple that starts from fastq files instead of fast5 files. It allows the analysis of multiple files at a time.
 * Added support to vbz compressed fast5 https://github.com/nanoporetech/vbz_compression in NanoPreprocess, NanoMod and NanoTail
 * NanoPreprocess now outputs also CRAM files and can do downsampling with the parameter --downsampling
@@ -43,5 +56,7 @@ Subworkflows are stored in the independent repository [BioNextflow](https://gith
 * Added profiles for being used locally and on the CRG SGE cluster
 
 
-## Version 1.0
+Version 1.0
+================
+
 This is the original version published in the paper [MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full)
