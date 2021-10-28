@@ -23,6 +23,8 @@ Input Parameters
      - kit used in library prep, required for basecalling
    * - **flowcell**
      - Flowcell used in sequencing, required for basecalling. 
+   * - **fast5 files**
+     - Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/&ast&ast/*.fast5]**. If empty it will search for fastq files and skip basecalling
 
 
 
