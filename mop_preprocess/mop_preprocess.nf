@@ -151,6 +151,9 @@ include { GET_VERSION as HTSEQ_VER } from "${subworkflowsDir}/read_count/htseq"
 include { GET_VERSION as BAMBU_VER } from "${subworkflowsDir}/assembly/bambu" 
 include { ASSEMBLE as BAMBU_ASSEMBLE } from "${subworkflowsDir}/assembly/bambu" addParams(EXTRAPARS: progPars["discovery--bambu"], OUTPUT:outputAssembly, LABEL:'big_mem_cpus')
 
+include { GET_VERSION as ISOQUANT_VER } from "${subworkflowsDir}/assembly/isoquant" 
+include { ASSEMBLE as ISOQUANT_ASSEMBLE } from "${subworkflowsDir}/assembly/isoquant" addParams(EXTRAPARS: progPars["discovery--isoquant"], OUTPUT:outputAssembly, LABEL:'big_mem_cpus')
+
 
 include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
@@ -356,15 +359,28 @@ workflow preprocess_flow {
 		println "Exiting ..."
 		System.exit(0)
 	} 
-	
 	if (params.discovery == "bambu" && params.ref_type == "genome"){
+		sorted_alns.map{
+			[it[1]]
+		}.collect().map{
+			["assembly", it]
+		}.set{data_to_bambu}	
+		bambu_out = BAMBU_ASSEMBLE(reference, annotation, data_to_bambu)
+	} else if (params.discovery == "isoquant" && params.ref_type == "genome"){
+		aln_indexes.map{
+			[it[1]]
+		}.collect().map{
+			["assembly", it]
+		}.set{ixd_4_bambu}
 		
 		sorted_alns.map{
 			[it[1]]
 		}.collect().map{
 			["assembly", it]
-		}.set{data_to_bambu}
-		bambu_out = BAMBU_ASSEMBLE(reference, annotation, data_to_bambu)
+		}.join(ixd_4_bambu).set{data_to_isoquant}
+		data_to_isoquant.view()
+	
+		bambu_out = ISOQUANT_ASSEMBLE(reference, annotation, data_to_isoquant)
 	} else if (params.discovery == "NO") {
 	} else {
 		println "ERROR ################################################################"
@@ -529,7 +545,7 @@ workflow preprocess_simple {
  		
  	}
 
-	all_ver = DEMULTIPLEX_VER().mix(FILTER_VER())
+	all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(FILTER_VER())
 	.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
 	.mix(MINIMAP2_VER()).mix(FASTQC_VER())
 	.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
