@@ -365,7 +365,7 @@ workflow preprocess_flow {
 			["assembly", it]
 		}.set{data_to_bambu}
 		bambu_out = BAMBU_ASSEMBLE(reference, annotation, data_to_bambu)
-	} else if (params.counting == "NO") {
+	} else if (params.discovery == "NO") {
 	} else {
 		println "ERROR ################################################################"
 		println "${params.discovery} is not compatible with ${params.ref_type}"
