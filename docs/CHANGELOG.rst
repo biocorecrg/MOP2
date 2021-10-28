@@ -25,12 +25,12 @@ Subworkflows are stored in the independent repository `BioNextflow <https://gith
 
 * mop_mod (formerly known as nanoMod)
      * now you can launch each analysis independently
+     * Fine tuning of parameter for each step in tools_opt.tsv
      * 4 workflows based on the following tools: 
       * epinano
       * nanopolish + nanocompore
       * tombo model_sample_compare
       * tombo level_sample_compare 
-      * Fine tuning of parameter for each step in tools_opt.tsv
 
 * mop_tail (formerly known as nanoTail)
      * now you can launch each analysis independently
