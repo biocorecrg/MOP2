@@ -1,8 +1,8 @@
 #step	tool	extrapars
 demultiplexing	deeplexicon	"-f multi -m $baseDir/deeplexicon/resnet20-final.h5"
-demultiplexing	guppy	"--barcode_kits EXP-NBD114"
+demultiplexing	guppy	""
 filtering	nanofilt	""
-basecalling	guppy	""
+basecalling	guppy	"--kit SQK-RNA002 --flowcell FLO-MIN106"
 mapping	graphmap	""
 mapping	graphmap2	""
 mapping	minimap2	"-ax map-ont -k14"
