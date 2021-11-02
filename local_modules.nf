@@ -627,14 +627,14 @@ process nanoConsensus {
 
 // Create a channel for tool options
 def getParameters(pars_tools_file) {
-	pars_tools = file(pars_tools_file)
+	def pars_tools = file(pars_tools_file)
 	if( !pars_tools.exists() ) exit 1, "Missing tools options config: '$pars_tools'"
 
 	def progPars = [:]
-	allLines  = pars_tools.readLines()
+	def allLines  = pars_tools.readLines()
 
 	for( line : allLines ) {
-    	list = line.split("\t")
+    	def list = line.split("\t")
     	if (list.length <3) {
 			 error "ERROR!!! Tool option file has to be tab separated\n" 
 		}
@@ -644,6 +644,27 @@ def getParameters(pars_tools_file) {
 	}	
 	return(progPars)
 }
+
+// Create a channel for tool options
+def parseFinalSummary(final_summary_file) {
+	final_summary = file(final_summary_file)
+	def outstring = ""
+	if( final_summary.exists() ) {
+		def allLines  = final_summary.readLines()
+
+		for( line : allLines ) {
+    		def list = line.split("=")
+    		if (list[0] == "protocol") {
+    			def vals = list[1].split(":")
+    			outstring = "--flowcell ${vals[1]} --kit ${vals[2]}"
+ 		   	}  
+		}	
+	} else {
+    	log.info '***No configuration file. You must specify kit and flowcell in the parameters!!***\n'
+	}
+	return(outstring)
+}
+
 
 def reshapeDemuxSamples(inputChannel) {
 	def reshapedChannel = inputChannel.map {

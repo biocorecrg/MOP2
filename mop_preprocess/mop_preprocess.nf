@@ -23,8 +23,8 @@ log.info """
 BIOCORE@CRG Master of Pores 2. Preprocessing - N F  ~  version ${version}
 ====================================================
 
-kit                       : ${params.kit}
-flowcell                  : ${params.flowcell}
+conffile				  : ${params.conffile}
+
 fast5                     : ${params.fast5}
 fastq                     : ${params.fastq}
 
@@ -80,6 +80,8 @@ config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
 logo = file("$baseDir/../img/logo_small.png")
 
+
+
 def gpu				    = params.GPU
 
 def tools = [:]
@@ -116,19 +118,21 @@ if (params.ref_type == "genome") {
  
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
-
 def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 
 
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
-include { checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+
+def guppypars = parseFinalSummary(params.conffile)
 
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
+def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
 
-include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: progPars["basecalling--guppy"], EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
+include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
 include { GET_VERSION as FILTER_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"], LABEL:'big_mem_cpus')
@@ -165,7 +169,6 @@ include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as f
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
 include { bam2Cram } from "${local_modules}" addParams(OUTPUT:outputCRAM, LABEL: 'big_cpus_ignore')
 
-
 /*
 * Simple flow of basecalling
 */
@@ -173,7 +176,7 @@ workflow flow1 {
     take: 
     	fast5_4_analysis
     main:
-		outbc = GUPPY_BASECALL (fast5_4_analysis, params.flowcell, params.kit)
+		outbc = GUPPY_BASECALL (fast5_4_analysis)
 	    basecalled_fastq = outbc.basecalled_fastq
 
 		// Optional fastq filtering	
@@ -202,7 +205,7 @@ workflow flow2 {
     main:
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
-			outbc = GUPPY_BASECALL(fast5_4_analysis, params.flowcell, params.kit)
+			outbc = GUPPY_BASECALL(fast5_4_analysis)
 			demux = DEMULTIPLEX_DEEPLEXICON(fast5_4_analysis)
 			fast5_res = outbc.basecalled_fast5
 		
@@ -222,7 +225,7 @@ workflow flow2 {
 
 		} else if (params.demultiplexing == "guppy") {
 			// IF DEMULTIPLEXING IS GUPPY	
-			outbc = GUPPY_BASECALL_DEMULTI (fast5_4_analysis, params.flowcell, params.kit)
+			outbc = GUPPY_BASECALL_DEMULTI (fast5_4_analysis)
 			demufq = outbc.basecalled_fastq
 			fast5_res = outbc.basecalled_fast5
 
@@ -522,7 +525,7 @@ workflow preprocess_simple {
 			[ "${it[0]}---${num}", it[1] ]
 		}.set{ fast5_4_analysis }
 
-		GET_WORKFLOWS(params.flowcell, params.kit).view()
+		//GET_WORKFLOWS(params.flowcell, params.kit).view()
 		if (params.basecalling == "guppy" && params.demultiplexing == "NO" ) outf = flow1(fast5_4_analysis)
 		else outf = flow2(fast5_4_analysis)
 		def bc_fast5 = outf.basecalled_fast5

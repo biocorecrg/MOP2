@@ -1,6 +1,5 @@
 params {
-    kit                 = "SQK-RNA002"
-    flowcell            = "FLO-MIN106"
+    conffile            = "final_summary_01.txt"
     fast5               = "$baseDir/../data/**/*.fast5"
     fastq               = ""
 
@@ -20,7 +19,7 @@ params {
 
     filtering           = "NO"
 
-    mapping             = "graphmap"
+    mapping             = "bwa"
     counting            = "nanocount"
     discovery           = "NO"
 
