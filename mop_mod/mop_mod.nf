@@ -258,13 +258,12 @@ workflow compore_polish_flow {
 		ref_file		
 	
 	main:	
-		nanop_events = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
-		mean_pps = mean_per_pos(nanop_events)
+		outnp = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
+		mean_pps = mean_per_pos(outnp.aligned_events)
 		concat_mean = concat_mean_per_pos(mean_pps.groupTuple())
-		//concat_mean.view()
-		combs_events = mapIDPairs(comparisons, concat_mean)
-		//combs_events.view()
-		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
+		combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
+		combs_events.view()
+		//NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
 	
 }
 
