@@ -134,6 +134,8 @@ include { GET_VERSION as FILTER_VER; FILTER as NANOFILT_FILTER} from "${subworkf
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"], LABEL:'big_mem_cpus')
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"], LABEL:'big_mem_cpus')
 include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"], LABEL:'big_mem_cpus')
+include { ALL as BWA} from "${subworkflowsDir}/alignment/bwa" addParams(EXTRAPARS: progPars["mapping--bwa"], LABEL:'big_mem_cpus')
+include { GET_VERSION as BWA_VER} from "${subworkflowsDir}/alignment/bwa" 
 include { GET_VERSION as GRAPHMAP_VER} from "${subworkflowsDir}/alignment/graphmap" 
 include { GET_VERSION as GRAPHMAP2_VER} from "${subworkflowsDir}/alignment/graphmap2" 
 include { GET_VERSION as MINIMAP2_VER} from "${subworkflowsDir}/alignment/minimap2" 
@@ -282,6 +284,9 @@ workflow preprocess_flow {
    			case "minimap2": 
    			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
+   			case "bwa": 
+   			aln_reads = BWA(reference, bc_fastq)
+   			break
    			default: 
 			println "ERROR ################################################################"
 			println "${params.mapping} is not a supported alignment"
@@ -422,6 +427,9 @@ workflow preprocess_simple {
    			case "minimap2": 
    			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
+   			case "bwa": 
+   			aln_reads = BWA(reference, bc_fastq)
+   			break
    			default: 
 			println "ERROR ################################################################"
 			println "${params.mapping} is not a supported alignment"
@@ -547,7 +555,7 @@ workflow preprocess_simple {
 
 	all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(FILTER_VER())
 	.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
-	.mix(MINIMAP2_VER()).mix(FASTQC_VER())
+	.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
 	.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
 	.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
  	
