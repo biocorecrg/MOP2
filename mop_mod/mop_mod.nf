@@ -263,7 +263,7 @@ workflow compore_polish_flow {
 		concat_mean = concat_mean_per_pos(mean_pps.groupTuple())
 		combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
 		combs_events.view()
-		//NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
+		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
 	
 }
 
