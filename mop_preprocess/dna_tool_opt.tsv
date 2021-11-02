@@ -1,5 +1,5 @@
 #step tool  extrapars
-basecalling guppy "--kit SQK-LSK109 --flowcell FLO-MIN106"
+basecalling guppy ""
 demultiplexing  guppy "--barcode_kits EXP-NBD114"
 filtering nanofilt  ""
 mapping graphmap  ""
