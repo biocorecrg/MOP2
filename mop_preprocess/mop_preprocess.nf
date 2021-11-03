@@ -130,7 +130,9 @@ def guppypars = parseFinalSummary(params.conffile)
 
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
+def guppy_aws = "-d /nextflow-bin/ont-guppy/data/"
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
+if (workflow.profile == "awsbatch" ) guppy_basecall_pars = guppy_basecall_pars + " " + guppy_aws
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
