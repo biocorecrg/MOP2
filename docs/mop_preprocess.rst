@@ -19,10 +19,8 @@ Input Parameters
 
    * - Parameter name
      - Description
-   * - **--kit**
-     - kit used in library prep, required for basecalling
-   * - **flowcell**
-     - Flowcell used in sequencing, required for basecalling. 
+   * - **conffile**
+     - Configuration file produced by the Nanopore instrument. It can be omitted but in that case the user must specify either the guppy parameters "--kit" and "--flowcell" or the custom model via **[NAME_tool_opt.tsv]** file
    * - **fast5 files**
      - Path to fast5 input files (single or multi-fast5 files). They should be inside folders that will be used as sample name. **[/Path/\*\*/*.fast5]**. If empty it will search for fastq files and skip basecalling
    * - **fastq files**
