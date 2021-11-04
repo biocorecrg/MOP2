@@ -124,7 +124,7 @@ def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
-include { parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 
 def guppypars = parseFinalSummary(params.conffile)
 
