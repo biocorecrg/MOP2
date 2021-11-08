@@ -10,8 +10,6 @@ library(reshape2)
 # Reading arguments from command line
 args = commandArgs(trailingOnly=TRUE)
 
-args <- c("2hpf-Rep1.tsv.per.site.var.csv.gz", "2hpf-Rep1", "4hpf-Rep1.tsv.per.site.var.csv.gz", "4hpf-Rep1", "mis")
-
 #Arguments
 zinput1<-gzfile(args[1], "rt")
 zinput2<-gzfile(args[3], "rt")
