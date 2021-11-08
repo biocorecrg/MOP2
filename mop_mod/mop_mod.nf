@@ -71,7 +71,7 @@ include { getParameters; mapIDPairs } from "${local_modules}"
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
 
-include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
+include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano" addParams(LABEL: 'big_mem_cpus', OUTPUT: outputEpinanoFlow, EXTRAPARS: progPars["epinano--epinano"])
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
@@ -173,7 +173,6 @@ workflow {
         		controlminus: it[1] =~ /\.control\.minus\./
     		}.set{combo_tombo}
 			stat_bw = wigToBigWig(chromSizes, stat_lsc.mix(stat_msc))
-			stat_bw.view()
 						
 			stat_bw.branch {
         		plus: it[1] =~ /\.plus\./
