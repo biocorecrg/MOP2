@@ -10,14 +10,18 @@ library(reshape2)
 # Reading arguments from command line
 args = commandArgs(trailingOnly=TRUE)
 
+args <- c("2hpf-Rep1.tsv.per.site.var.csv.gz", "2hpf-Rep1", "4hpf-Rep1.tsv.per.site.var.csv.gz", "4hpf-Rep1", "mis")
+
 #Arguments
 zinput1<-gzfile(args[1], "rt")
 zinput2<-gzfile(args[3], "rt")
 
 input1 <- read.delim(zinput1,sep=",")  #1st variable
-label1 <- as.character(args[2])  #1st label
+plotlab1<-as.character(args[2])
+plotlab2<-as.character(args[4])
+label1 <- gsub("-", "_", paste0("X", as.character(args[2])))  #1st label
 input2 <-read.delim(zinput2,sep=",") #2nd variable
-label2 <- as.character(args[4]) #2nd label
+label2 <- gsub("-", "_", paste0("X", as.character(args[4]))) #2nd label
 feature<- as.character(args[5]) #Feature
 
 
@@ -60,15 +64,15 @@ for (chr in unique(data$Chr)) {
 		res_vec <- res$residuals#this contains residuals 
 		threshold <-  5 * sd(res_vec) #The threshold
 		subs$score<- abs(subs[,c(paste(label1, "value", sep="_"))] - subs[,c(paste(label2, "value", sep="_"))])
-		pdf(file=paste(chr,feature, label1, label2, "scatter.pdf", sep="_"),height=5,width=5,onefile=FALSE)
+		pdf(file=paste(chr,feature, plotlab1, plotlab2, "scatter.pdf", sep="_"),height=5,width=5,onefile=FALSE)
 			print(ggplot(subs, aes_string(x=paste(label1, "value", sep="_"), y=paste(label2, "value", sep="_"))) +
 				geom_point(size=2, color="grey")+
 				geom_abline(slope=1, intercept=0,linetype="dashed")+
      				geom_point(data=subset(subs, score>threshold), size=2, color="red")+
      				geom_text_repel(data=subset(subs, score>threshold), aes(label=chr_pos), colour="black",segment.size  = 0.4,segment.color = "grey50",size=5)+
      				ggtitle(feature)+
-				xlab(label1)+
-				ylab(label2) +
+				xlab(plotlab1)+
+				ylab(plotlab2) +
 				theme_bw()+
 				theme(axis.text.x = element_text(face="bold", color="black",size=11),
 					 axis.text.y = element_text(face="bold", color="black", size=11),
