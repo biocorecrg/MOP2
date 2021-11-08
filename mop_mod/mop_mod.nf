@@ -59,7 +59,6 @@ def subworkflowsDir = "${baseDir}/../BioNextflow/subworkflows"
 model_folder = file("$baseDir/models/")
 if( !model_folder.exists() ) exit 1, "Missing folders with EpiNano's models!"
 joinScript = file("$baseDir/bin/join.r")
-mergeTomboScript = file("$baseDir/bin/Merge_Tombo_wigs_MoP_v2.R")
 
 def flows = [:]
 flows["nanomod"] = params.epinano
@@ -84,7 +83,7 @@ include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modifica
 include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore" 
 include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
 
-include { indexReference; callVariants; mean_per_pos; concat_mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
+include { wigToBigWig; getChromInfo; indexReference; callVariants; mean_per_pos; concat_mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
 include {  mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus} addParams(OUTPUT: outputTomboFlow) from "${local_modules}"
 include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } addParams(OUTPUT: outputEpinanoFlow) from "${local_modules}"
 
@@ -145,10 +144,12 @@ workflow {
 
 	if (params.tombo_lsc == "YES" || params.tombo_msc == "YES") {
 		tombo_data = tombo_common_flow(fast5_files, ref_file, comparisons)
-	    
+	    chromSizes = getChromInfo(ref_file)
+
 		if (params.tombo_msc == "YES") {
 			tombo_msc_flow(tombo_data, ref_file)
-			wiggle_msc = bedGraphToWig_msc(tombo_msc_flow.out.bed_graphs.transpose()).map{
+			
+			wiggle_msc = bedGraphToWig_msc(chromSizes, tombo_msc_flow.out.bed_graphs.transpose()).map{
 				["${it[0]}_msc", it[1] ]
 			}
 			stat_msc = tombo_msc_flow.out.dampened_wiggles.transpose().map{
@@ -157,7 +158,7 @@ workflow {
 		}
 		if (params.tombo_lsc == "YES") {
 			tombo_lsc_flow(tombo_data, ref_file)
-			wiggle_lsc = bedGraphToWig_lsc(tombo_lsc_flow.out.bed_graphs.transpose()).map{
+			wiggle_lsc = bedGraphToWig_lsc(chromSizes, tombo_lsc_flow.out.bed_graphs.transpose()).map{
 				["${it[0]}_lsc", it[1] ]
 			}
 			stat_lsc = tombo_lsc_flow.out.dampened_wiggles.transpose().map{
@@ -171,13 +172,17 @@ workflow {
         		controlplus: it[1] =~ /\.control\.plus\./
         		controlminus: it[1] =~ /\.control\.minus\./
     		}.set{combo_tombo}
-			stat_lsc.mix(stat_msc).branch {
+			stat_bw = wigToBigWig(chromSizes, stat_lsc.mix(stat_msc))
+			stat_bw.view()
+						
+			stat_bw.branch {
         		plus: it[1] =~ /\.plus\./
         		minus: it[1] =~ /\.minus\./
     		}.set{combo_stats}
+			
 
-    		mergeTomboWigsPlus("plus", mergeTomboScript, combo_tombo.sampleplus.join(combo_tombo.controlplus).join(combo_stats.plus))
-    		mergeTomboWigsMinus("minus", mergeTomboScript, combo_tombo.sampleminus.join(combo_tombo.controlminus).join(combo_stats.minus))
+    		mergeTomboWigsPlus("plus", combo_tombo.sampleplus.join(combo_tombo.controlplus).join(combo_stats.plus))
+    		mergeTomboWigsMinus("minus", combo_tombo.sampleminus.join(combo_tombo.controlminus).join(combo_stats.minus))
 	}
 	
 	all_ver = EPINANO_VER().mix(NANOPOLISH_VER())
@@ -262,7 +267,6 @@ workflow compore_polish_flow {
 		mean_pps = mean_per_pos(outnp.aligned_events)
 		concat_mean = concat_mean_per_pos(mean_pps.groupTuple())
 		combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
-		combs_events.view()
 		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
 	
 }

@@ -323,7 +323,7 @@ process checkRef {
 
 process indexReference {
     label (params.LABEL)
-    container 'biocorecrg/mopmod:0.5'
+    container 'biocorecrg/mopmod:0.6'
     tag "Indexing ${ reference }"
 
     input:
@@ -349,7 +349,7 @@ process indexReference {
 
 process mean_per_pos {
 
-    container 'biocorecrg/mopmod:0.5'
+    container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
     tag "${idsample}" 
 	
@@ -373,7 +373,7 @@ process mean_per_pos {
 */
 process concat_mean_per_pos {
 
-    container 'biocorecrg/mopmod:0.5'
+    container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
     tag "${idsample}" 
 	
@@ -397,7 +397,7 @@ process concat_mean_per_pos {
 
 process callVariants {
     tag "${sampleID}" 
-    container 'biocorecrg/mopmod:0.5'
+    container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
 	
     input:
@@ -433,7 +433,7 @@ process makeEpinanoPlots {
 }
 
 process multiToSingleFast5 {
-    container 'biocorecrg/mopmod:0.5'
+    container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
 
     tag "${idsample}"  
@@ -457,19 +457,22 @@ process multiToSingleFast5 {
 *
 */
 process bedGraphToWig {
-    container 'biocorecrg/mopmod:0.5'
+    container 'biocorecrg/mopmod:0.6'
     tag "${idsample}"  
 	
     input:
+    path(chromsizes)
     tuple val(idsample), path(bedgraph)
     
     output:
-    tuple val(idsample), path("*.wig")
+    tuple val(idsample), path("*.bw")
        
     script:
     def ofname = "${bedgraph.baseName}.wig"
 	"""
 	bedgraph2wig.pl --bedgraph ${bedgraph} --wig ${ofname} --step 1 --compact
+	wigToBigWig ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
+	rm *.wig
 	"""
 }
 
@@ -479,25 +482,44 @@ process mergeTomboWigs {
     label (params.LABEL)
     tag "${combID}"  
 	publishDir params.OUTPUT, pattern: "*_Tombo_Output.tsv",  mode: 'copy'
-	container "biocorecrg/mopnanotail:0.2"
+	container "biocorecrg/mopmod:0.6"
 
    input:
     val(strand)
-    path(mergeTomboScript)
     tuple val(combID), path(coverage), path(covcontrol), path(statistic)
 
 	output:
-	path("*_Tombo_Output.tsv") optional true 
+	path("*_Tombo_Output.tsv.gz") optional true 
 	
 	script:
 	"""
-      Rscript --vanilla ${mergeTomboScript} \
-      -stats_wig ${statistic} \
-      -Cov_WT ${coverage} \
-      -Cov_Control ${covcontrol} \
-      -output ${combID}.${strand}
+	Merge_Tombo.py ${statistic} ${covcontrol} ${coverage} ${combID}.${strand}
+	gzip *_Tombo_Output.tsv
 	"""
 }
+/*
+*/
+process wigToBigWig {
+    label (params.LABEL)
+    tag "${id}"  
+	container "biocorecrg/mopmod:0.6"
+    errorStrategy 'ignore'
+
+   input:
+    path(chromsizes)
+    tuple val(id), path(bedgraph)
+
+	output:
+	tuple val(id), path("*.bw") optional true 
+	
+	script:
+    def ofname = "${bedgraph.baseName}.bw"
+
+	"""
+	wigToBigWig ${bedgraph} ${chromsizes} ${ofname}
+	"""
+}
+
 
 // MOP_TAIL
 
@@ -583,6 +605,24 @@ process indexFasta {
 	"""
 	samtools faidx ${reference}
 	cut -f 1,2 ${reference}.fai
+	"""
+}
+
+process getChromInfo {
+    label (params.LABEL)
+
+    tag "${reference}" 
+	
+    input:
+    path(reference)
+    
+    output:
+    path("chrom.sizes")   
+       
+    script:
+	"""
+	samtools faidx ${reference}
+	cut -f 1,2 ${reference}.fai > chrom.sizes
 	"""
 }
 
