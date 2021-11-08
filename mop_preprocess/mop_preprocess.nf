@@ -31,13 +31,12 @@ fastq                     : ${params.fastq}
 reference                 : ${params.reference}
 annotation                : ${params.annotation}
 
-granularity		  : ${params.granularity}
+granularity		  		  : ${params.granularity}
 
 ref_type                  : ${params.ref_type}
-pars_tools		  : ${params.pars_tools}
+pars_tools		  		  : ${params.pars_tools}
 
 output                    : ${params.output}
-qualityqc                 : ${params.qualityqc}
 
 GPU                       : ${params.GPU}
 
@@ -49,13 +48,13 @@ filtering                 : ${params.filtering}
 mapping                   : ${params.mapping}
 
 counting                  : ${params.counting}
-discovery		  : ${params.discovery}
+discovery		          : ${params.discovery}
 
 cram_conv           	  : ${params.cram_conv}
-subsampling_cram	  : ${params.subsampling_cram}
+subsampling_cram	      : ${params.subsampling_cram}
 
 
-saveSpace   		  : ${params.saveSpace}
+saveSpace   		      : ${params.saveSpace}
 
 email                     : ${params.email}
 """
@@ -130,13 +129,12 @@ def guppypars = parseFinalSummary(params.conffile)
 
 // Create a channel for tool options
 progPars = getParameters(params.pars_tools)
-def guppy_aws = "-d /nextflow-bin/ont-guppy/data/"
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
-if (workflow.profile == "awsbatch" ) guppy_basecall_pars = guppy_basecall_pars + " " + guppy_aws
 
 include { GET_WORKFLOWS; BASECALL as GUPPY_BASECALL; BASECALL_DEMULTI as GUPPY_BASECALL_DEMULTI } from "${subworkflowsDir}/basecalling/guppy" addParams(EXTRAPARS_BC: guppy_basecall_pars, EXTRAPARS_DEM: progPars["demultiplexing--guppy"], LABEL: guppy_basecall_label, GPU_OPTION: gpu, MOP: "YES", OUTPUT: output_bc, OUTPUTMODE: outmode)
 include { GET_VERSION as DEMULTIPLEX_VER; DEMULTIPLEX as DEMULTIPLEX_DEEPLEXICON } from "${subworkflowsDir}/demultiplexing/deeplexicon" addParams(EXTRAPARS: progPars["demultiplexing--deeplexicon"], LABEL:deeplexi_basecall_label, GPU_OPTION: gpu)
-include { GET_VERSION as FILTER_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
+include { GET_VERSION as NANOFILT_VER; FILTER as NANOFILT_FILTER} from "${subworkflowsDir}/trimming/nanofilt" addParams(EXTRAPARS: progPars["filtering--nanofilt"])
+include { GET_VERSION as NANOQ_VER; FILTER as NANOQ_FILTER} from "${subworkflowsDir}/trimming/nanoq" addParams(EXTRAPARS: progPars["filtering--nanoq"])
 include { MAP as GRAPHMAP} from "${subworkflowsDir}/alignment/graphmap" addParams(EXTRAPARS: progPars["mapping--graphmap"], LABEL:'big_mem_cpus')
 include { MAP as GRAPHMAP2} from "${subworkflowsDir}/alignment/graphmap2" addParams(EXTRAPARS: progPars["mapping--graphmap2"], LABEL:'big_mem_cpus')
 include { MAP as MINIMAP2} from "${subworkflowsDir}/alignment/minimap2" addParams(EXTRAPARS: progPars["mapping--minimap2"], LABEL:'big_mem_cpus')
@@ -185,7 +183,11 @@ workflow flow1 {
 		if (params.filtering == "nanofilt") {
 			nanofilt = NANOFILT_FILTER(outbc.basecalled_fastq)
 			basecalled_fastq = reshapeSamples(nanofilt.out)
-		} 
+		} else if (params.filtering == "nanoq") {
+			nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
+			basecalled_fastq = reshapeSamples(nanofilt.out)
+		}
+		
  	    //bc_fastq = reshapeSamples(basecalled_fastq)
 		bc_fast5 = reshapeSamples(outbc.basecalled_fast5)
 		bc_stats = reshapeSamples(outbc.basecalling_stats)
@@ -250,6 +252,9 @@ workflow flow2 {
 		if (params.filtering == "nanofilt") {
  			nanofilt = NANOFILT_FILTER(reshapedDemufq)
  			reshapedDemufq = nanofilt
+		} else if (params.filtering == "nanoq") {
+			nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
+			basecalled_fastq = reshapeSamples(nanofilt.out)
 		}
 
 	emit:
@@ -558,7 +563,7 @@ workflow preprocess_simple {
  		
  	}
 
-	all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(FILTER_VER())
+	all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
 	.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
 	.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
 	.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
