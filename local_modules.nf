@@ -471,7 +471,7 @@ process bedGraphToWig {
     def ofname = "${bedgraph.baseName}.wig"
 	"""
 	bedgraph2wig.pl --bedgraph ${bedgraph} --wig ${ofname} --step 1 --compact
-	wigToBigWig ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
+	wigToBigWig -clip ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
 	rm *.wig
 	"""
 }
@@ -503,7 +503,7 @@ process wigToBigWig {
     label (params.LABEL)
     tag "${id}"  
 	container "biocorecrg/mopmod:0.6"
-    errorStrategy 'ignore'
+    //errorStrategy 'ignore'
 
    input:
     path(chromsizes)
@@ -516,7 +516,13 @@ process wigToBigWig {
     def ofname = "${bedgraph.baseName}.bw"
 
 	"""
-	wigToBigWig ${bedgraph} ${chromsizes} ${ofname}
+	size=`zcat ${bedgraph} | wc -l`;
+   	if [[ \$size -gt 2 ]]
+    then
+		wigToBigWig -clip ${bedgraph} ${chromsizes} ${ofname}
+    else
+    	echo "empty wig"
+    fi
 	"""
 }
 
