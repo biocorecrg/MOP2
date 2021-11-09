@@ -128,6 +128,8 @@ include { extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshape
 def guppypars = parseFinalSummary(params.conffile)
 
 // Create a channel for tool options
+if (workflow.profile == "awsbatch") guppypars = guppypars + " --data_path nextflow-bin"
+
 progPars = getParameters(params.pars_tools)
 def guppy_basecall_pars = guppypars + " " + progPars["basecalling--guppy"]
 
