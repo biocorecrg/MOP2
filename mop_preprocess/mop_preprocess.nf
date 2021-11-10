@@ -606,7 +606,7 @@ else {
         """
         .stripIndent()
 
-        sendMail(to: params.email, subject: "Master of Pore 2 execution", body: msg)
+        sendMail(to: params.email, subject: "Master of Pore 2 execution", body: msg, attach: "${outputMultiQC}/multiqc_report.html")
     }
 }
 
