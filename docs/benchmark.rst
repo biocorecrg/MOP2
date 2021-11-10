@@ -4,10 +4,42 @@ Benchmark
 
 We tested MoP on different datasets:
 
+MOP_PREPROCESS
+-----------------
 
 .. list-table:: Dataset
    
- * - **MOP_PREPROCESS**
+ * - 
+   - Toy sample
+   - Flongle
+   - MinION
+   - gridION
+   - PromethION
+ * - Fast5 files
+   - 10 
+   - 20 
+   - 100 
+   - 500 
+   - 2,916 
+ * - Reads
+   - 8,000
+   - 16,000
+   - 400,000 
+   - 2000,000
+   - 11,600,000
+ * - Execution time (mins)
+   - x
+   - x
+   - x
+   - x
+   - x
+
+MOP_MOD
+-----------------
+
+.. list-table:: Dataset
+
+ * - 
    - Toy sample
    - Flongle
    - MinION
@@ -32,5 +64,3 @@ We tested MoP on different datasets:
    - x
    - x
 
-
- 
