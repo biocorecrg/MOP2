@@ -5,7 +5,7 @@ Benchmark
 We tested MoP on different datasets:
 
 .. list-table:: Dataset:
-   :widths: 50 50 50 50
+   :widths: 50 50 50 50 50 50
    :header-rows: 1
 
  * - 
@@ -18,19 +18,20 @@ We tested MoP on different datasets:
    - 10 
    - 20 
    - 100 
-   - xxx 
-   - 1000 
+   - 500 
+   - 2916 
  * - Reads
    - 8,000
    - 16,000
    - 800,000 
+   - 2000,000
+   - 11,600,000
+ * - Execution time (mins)
+   - 10
+   - 18
    - x
    - x
-* - Execution time (mins)
-  - 10
-  - 18
-  - x 
-  - x
-  - x
+   - x
+
 
  
