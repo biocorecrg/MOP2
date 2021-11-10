@@ -30,7 +30,7 @@ We tested MoP on different datasets:
  * - Execution time (mins)
    - 10
    - 18
-   - x
+   - 74
    - x
    - x
 
