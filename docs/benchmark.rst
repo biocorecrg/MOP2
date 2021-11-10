@@ -9,7 +9,7 @@ We tested MoP on different datasets:
    :header-rows: 1
    :column-alignment: left center right right right right
 
- * - 
+ * - **MOP_PREPROCESS**
    - Toy sample
    - Flongle
    - MinION
