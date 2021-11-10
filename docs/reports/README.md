@@ -1,0 +1,1 @@
+List o nextflow reports
