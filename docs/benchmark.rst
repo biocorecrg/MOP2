@@ -4,11 +4,9 @@ Benchmark
 
 We tested MoP on different datasets:
 
-.. list-table:: Dataset:
-   :widths: 50 50 50 50 50 50
-   :header-rows: 1
-   :column-alignment: left center right right right right
 
+.. list-table:: Dataset
+   
  * - **MOP_PREPROCESS**
    - Toy sample
    - Flongle
