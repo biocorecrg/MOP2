@@ -7,6 +7,7 @@ We tested MoP on different datasets:
 .. list-table:: Dataset:
    :widths: 50 50 50 50 50 50
    :header-rows: 1
+   :column-alignment: left center right right right right
 
  * - 
    - Toy sample
@@ -19,7 +20,7 @@ We tested MoP on different datasets:
    - 20 
    - 100 
    - 500 
-   - 2916 
+   - 2,916 
  * - Reads
    - 8,000
    - 16,000
