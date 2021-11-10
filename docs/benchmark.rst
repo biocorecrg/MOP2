@@ -24,7 +24,7 @@ We tested MoP on different datasets:
  * - Reads
    - 8,000
    - 16,000
-   - 800,000 
+   - 400,000 
    - 2000,000
    - 11,600,000
  * - Execution time (mins)
