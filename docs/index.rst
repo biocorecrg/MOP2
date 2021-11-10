@@ -35,6 +35,7 @@ Contents:
    mop_mod
    mop_consensus
    mop_tail
+   benchmark
    changelog
    
 
