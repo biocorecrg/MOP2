@@ -28,9 +28,9 @@ MOP_PREPROCESS
    - 2,000,000
    - 11,600,000
  * - Execution time (mins)
-   - x
-   - x
-   - x
+   - 10
+   - 18
+   - 74
    - x
    - x
 
@@ -58,9 +58,9 @@ MOP_MOD
    - 2,000,000
    - 11,600,000
  * - Execution time (mins)
-   - 10
-   - 18
-   - 74
+   - x
+   - x
+   - x
    - x
    - x
 
