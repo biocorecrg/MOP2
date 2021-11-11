@@ -57,8 +57,8 @@ MOP_MOD
    - 400,000 
    - 2,000,000
    - 11,600,000
- * - Execution time (mins)
-   - 45
+ * - Execution time
+   - 45m
    - x
    - x
    - x
