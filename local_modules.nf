@@ -465,15 +465,22 @@ process bedGraphToWig {
     tuple val(idsample), path(bedgraph)
     
     output:
-    tuple val(idsample), path("*.bw")
+    tuple val(idsample), path("*.bw") optional true 
        
     script:
     def ofname = "${bedgraph.baseName}.wig"
-	"""
+    """
 	bedgraph2wig.pl --bedgraph ${bedgraph} --wig ${ofname} --step 1 --compact
-	wigToBigWig -clip ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
-	rm *.wig
-	"""
+
+        size=`zcat ${ofname} | wc -l`;
+        if [[ \$size -gt 2 ]]
+        then
+            wigToBigWig -clip ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
+            rm *.wig 
+        else
+            echo "empty wig"
+        fi
+    """
 }
 
 /*
