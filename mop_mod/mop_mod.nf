@@ -75,7 +75,7 @@ include { CALC_VAR_FREQUENCIES as EPINANO_CALC_VAR_FREQUENCIES } from "${subwork
 include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
-include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_msc--tombo"])
+include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputNanoPolComFlow)
 include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"])
 
 include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano" 
@@ -173,12 +173,14 @@ workflow {
         		controlminus: it[1] =~ /\.control\.minus\./
     		}.set{combo_tombo}
 			stat_bw = wigToBigWig(chromSizes, stat_lsc.mix(stat_msc))
-						
+			
+					
 			stat_bw.branch {
         		plus: it[1] =~ /\.plus\./
         		minus: it[1] =~ /\.minus\./
     		}.set{combo_stats}
 			
+			//combo_stats.plus.view()
 
     		mergeTomboWigsPlus("plus", combo_tombo.sampleplus.join(combo_tombo.controlplus).join(combo_stats.plus))
     		mergeTomboWigsMinus("minus", combo_tombo.sampleminus.join(combo_tombo.controlminus).join(combo_stats.minus))

@@ -465,22 +465,15 @@ process bedGraphToWig {
     tuple val(idsample), path(bedgraph)
     
     output:
-    tuple val(idsample), path("*.bw") optional true 
+    tuple val(idsample), path("*.bw")
        
     script:
     def ofname = "${bedgraph.baseName}.wig"
-    """
+	"""
 	bedgraph2wig.pl --bedgraph ${bedgraph} --wig ${ofname} --step 1 --compact
-
-        size=`zcat ${ofname} | wc -l`;
-        if [[ \$size -gt 2 ]]
-        then
-            wigToBigWig -clip ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
-            rm *.wig 
-        else
-            echo "empty wig"
-        fi
-    """
+	wigToBigWig -clip ${ofname} ${chromsizes} ${bedgraph.baseName}.bw
+	rm *.wig
+	"""
 }
 
 /*
@@ -488,7 +481,7 @@ process bedGraphToWig {
 process mergeTomboWigs {
     label (params.LABEL)
     tag "${combID}"  
-	publishDir params.OUTPUT, pattern: "*_Tombo_Output.tsv",  mode: 'copy'
+	publishDir params.OUTPUT, pattern: "*_Tombo_Output.tsv.gz",  mode: 'copy'
 	container "biocorecrg/mopmod:0.6"
 
    input:
