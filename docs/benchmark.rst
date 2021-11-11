@@ -2,7 +2,7 @@
 Benchmark
 *******************
 
-We tested MoP on different datasets at the CRG HPC where we can run up to 100 jobs in parallel and using up to 10 GPU cards (GeForce RTX 2080 Ti).
+We tested MoP on different datasets at the CRG's HPC where we can run up to 100 jobs in parallel (maximum 8 CPUs each) and using up to 10 GPU cards (GeForce RTX 2080 Ti).
 
 MOP_PREPROCESS
 -----------------
