@@ -123,7 +123,7 @@ def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
-include { extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { RNA2DNA; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 
 def guppypars = parseFinalSummary(params.conffile)
 
@@ -288,7 +288,9 @@ workflow preprocess_flow {
 	else {
 		switch(params.mapping) { 
    			case "graphmap": 
-   			aln_reads = GRAPHMAP(bc_fastq, reference)
+   			//GRAPHMAP cannot align RNA
+   			dna_bc_fastq = RNA2DNA(bc_fastq)
+   			aln_reads = GRAPHMAP(dna_bc_fastq, reference)
    			break
    			case "graphmap2": 
    			aln_reads = GRAPHMAP2(bc_fastq, reference)
