@@ -174,13 +174,12 @@ workflow {
     		}.set{combo_tombo}
 			stat_bw = wigToBigWig(chromSizes, stat_lsc.mix(stat_msc))
 			
-			stat_bw.view()
-					
 			stat_bw.branch {
         		plus: it[1] =~ /\.plus\./
         		minus: it[1] =~ /\.minus\./
     		}.set{combo_stats}
 			
+			//combo_stats.plus.view()
 
     		mergeTomboWigsPlus("plus", combo_tombo.sampleplus.join(combo_tombo.controlplus).join(combo_stats.plus))
     		mergeTomboWigsMinus("minus", combo_tombo.sampleminus.join(combo_tombo.controlminus).join(combo_stats.minus))

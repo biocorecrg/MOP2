@@ -13,13 +13,13 @@ params {
     granularity         = 1
 
     basecalling         = "guppy"
-    GPU                 = "OFF"
-    demultiplexing      = "NO"
-    demulti_fast5       = "NO" 
+    GPU                 = "ON"
+    demultiplexing      = "deeplexicon"
+    demulti_fast5       = "YES" 
 
-    filtering           = "NO"
+    filtering           = "nanoq"
 
-    mapping             = "bwa"
+    mapping             = "graphmap"
     counting            = "nanocount"
     discovery           = "NO"
 
@@ -28,5 +28,5 @@ params {
 
     saveSpace           = "NO"
 
-    email               = ""
+    email               = "lucacozzuto@crg.es"
 }

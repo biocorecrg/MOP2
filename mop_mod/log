@@ -1,5 +1,5 @@
 N E X T F L O W  ~  version 21.04.3
-Launching `mop_mod.nf` [confident_cantor] - revision: 113ffb3b6a
+Launching `mop_mod.nf` [distraught_kowalevski] - revision: aeb900e312
 
 
 ╔╦╗╔═╗╔═╗  ╔╦╗┌─┐┌┬┐
@@ -11,12 +11,12 @@ BIOCORE@CRG Master of Pores 2. Detection of RNA modification - N F  ~  version 2
 ====================================================
 
 *****************   Input files    *******************
-input_path                              : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/../mop_preprocess/output/
+input_path                              : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/../mop_preprocess/test1/
 comparison                              : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/comparison.tsv
 
 ********** reference has to be the genome *************
-reference                               : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/../anno/yeast_rRNA_ref.fa.gz
-output                                  : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/output_gen
+reference                               : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/../anno/Danio_rerio.GRCz11.cds.all.fa.gz
+output                                  : /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/output_test1
 
 coverage                                : 5
 pars_tools								: /nfs/software/bi/biocore_tools/git/nextflow_dls2/MoP2/mop_mod/tools_opt.tsv
@@ -27,27 +27,67 @@ nanocompore                             : YES
 tombo_lsc                               : YES
 tombo_msc                               : YES
 
-
 email                                   : 
 
 Skipping the email
 
-[2d/f8e71c] Cached process > checkRef (Checking yeast_rRNA_ref.fa.gz)
-[7f/46f023] Cached process > NANOPOLISH_EVENTALIGN:index (snR36_WT)
-[d2/396d58] Cached process > NANOPOLISH_EVENTALIGN:index (snR36_KO)
-[af/aa2e16] Cached process > epinano_flow:indexReference (Indexing reference.fa)
-[8d/668a9f] Cached process > epinano_flow:callVariants (snR36_WT)
-[b3/7232ba] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch5.fast5)
-[77/9e1004] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch3.fast5)
-[7b/83c2ec] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch1.fast5)
-[70/671dd0] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_WT--batch0_2.fast5)
-[7f/72ca98] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_WT--batch0_1.fast5)
-[22/3d2d5f] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch0.fast5)
-[62/928edd] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch2.fast5)
-[64/386ffc] Cached process > NANOPOLISH_EVENTALIGN:eventalign (snR36_KO--batch4.fast5)
-[3d/96269a] Cached process > epinano_flow:EPINANO_CALC_VAR_FREQUENCIES:calcVarFrequencies (snR36_WT)
+[88/bd40e0] Submitted process > tombo_common_flow:multiToSingleFast5 (4hpf-Rep1---batch_1)
+[09/fcf464] Submitted process > tombo_common_flow:multiToSingleFast5 (4hpf-Rep1---batch_0)
+[82/d258c1] Submitted process > EPINANO_VER:getVersion
+[32/5388f1] Submitted process > NANOCOMPORE_VER:getVersion
+[fe/34bb36] Submitted process > NANOPOLISH_VER:getVersion
+[db/d726ad] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:index (2hpf-Rep1)
+[ba/362cd8] Submitted process > tombo_common_flow:multiToSingleFast5 (2hpf-Rep1---batch_0)
+[e9/769409] Submitted process > TOMBO_VER:getVersion
+[34/05d5f1] Submitted process > tombo_common_flow:multiToSingleFast5 (2hpf-Rep1---batch_1)
+[a1/a24ea3] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:index (4hpf-Rep1)
+[ab/13bb21] Submitted process > checkRef (Checking Danio_rerio.GRCz11.cds.all.fa.gz)
+[6b/5752a5] Submitted process > getChromInfo (reference.fa)
+[c4/c25d66] Submitted process > epinano_flow:indexReference (Indexing reference.fa)
+[e7/c627dc] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:eventalign (4hpf-Rep1--batch_0.fast5)
+[3d/f81cae] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:eventalign (2hpf-Rep1--batch_1.fast5)
+[54/c8c41b] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:eventalign (2hpf-Rep1--batch_0.fast5)
+[41/8357f1] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:eventalign (4hpf-Rep1--batch_1.fast5)
+[67/c6cc1d] Submitted process > epinano_flow:callVariants (2hpf-Rep1)
+[22/60ee65] Submitted process > epinano_flow:callVariants (4hpf-Rep1)
+[e0/bfa615] Submitted process > tombo_common_flow:TOMBO_RESQUIGGLE_RNA:resquiggle_rna (4hpf-Rep1---batch_0)
+[6f/226127] Submitted process > tombo_common_flow:TOMBO_RESQUIGGLE_RNA:resquiggle_rna (4hpf-Rep1---batch_1)
+[cb/372cbc] Submitted process > tombo_common_flow:TOMBO_RESQUIGGLE_RNA:resquiggle_rna (2hpf-Rep1---batch_0)
+[d6/a6de2c] Submitted process > tombo_common_flow:TOMBO_RESQUIGGLE_RNA:resquiggle_rna (2hpf-Rep1---batch_1)
+[47/111145] Submitted process > epinano_flow:EPINANO_CALC_VAR_FREQUENCIES:calcVarFrequencies (2hpf-Rep1)
+[b7/fe2135] Submitted process > epinano_flow:EPINANO_CALC_VAR_FREQUENCIES:calcVarFrequencies (4hpf-Rep1)
+[56/f41f11] Submitted process > compore_polish_flow:mean_per_pos (4hpf-Rep1)
+[74/996e39] Submitted process > compore_polish_flow:mean_per_pos (4hpf-Rep1)
+[ae/5af364] Submitted process > compore_polish_flow:mean_per_pos (2hpf-Rep1)
+[33/5e4818] Submitted process > compore_polish_flow:mean_per_pos (2hpf-Rep1)
+[e9/65d3b3] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:eventalignCollapse (2hpf-Rep1)
+[b4/cac270] Submitted process > compore_polish_flow:NANOPOLISH_EVENTALIGN:eventalignCollapse (4hpf-Rep1)
+[ee/9274e5] Submitted process > tombo_lsc_flow:TOMBO_GET_MODIFICATION_LSC:getModificationsWithLevelSampleCompare (2hpf-Rep1 vs 4hpf-Rep1)
+[4f/b0e9e2] Submitted process > tombo_msc_flow:TOMBO_GET_MODIFICATION_MSC:getModificationsWithModelSampleCompare (2hpf-Rep1 vs 4hpf-Rep1)
+[2d/422a0b] Submitted process > bedGraphToWig_lsc (2hpf-Rep1---4hpf-Rep1)
+[85/dc87d0] Submitted process > bedGraphToWig_lsc (2hpf-Rep1---4hpf-Rep1)
+[93/9c9187] Submitted process > bedGraphToWig_lsc (2hpf-Rep1---4hpf-Rep1)
+[70/296804] Submitted process > bedGraphToWig_lsc (2hpf-Rep1---4hpf-Rep1)
+[31/e96ef1] Submitted process > wigToBigWig (2hpf-Rep1---4hpf-Rep1_lsc)
+[cc/4c115f] Submitted process > wigToBigWig (2hpf-Rep1---4hpf-Rep1_lsc)
+[31/e96ef1] NOTE: Process `wigToBigWig (2hpf-Rep1---4hpf-Rep1_lsc)` terminated with an error exit status (255) -- Error is ignored
+[cc/4c115f] NOTE: Process `wigToBigWig (2hpf-Rep1---4hpf-Rep1_lsc)` terminated with an error exit status (255) -- Error is ignored
+[74/6d4789] Submitted process > wigToBigWig (2hpf-Rep1---4hpf-Rep1_msc)
+[cb/a8d021] Submitted process > bedGraphToWig_msc (2hpf-Rep1---4hpf-Rep1)
+[4d/04a6da] Submitted process > wigToBigWig (2hpf-Rep1---4hpf-Rep1_msc)
+[3b/273d76] Submitted process > bedGraphToWig_msc (2hpf-Rep1---4hpf-Rep1)
+[89/a11452] Submitted process > bedGraphToWig_msc (2hpf-Rep1---4hpf-Rep1)
+[2b/011954] Submitted process > bedGraphToWig_msc (2hpf-Rep1---4hpf-Rep1)
+[ad/81590b] Submitted process > compore_polish_flow:concat_mean_per_pos (4hpf-Rep1)
+[a4/3dc427] Submitted process > compore_polish_flow:concat_mean_per_pos (2hpf-Rep1)
+[74/6d4789] NOTE: Process `wigToBigWig (2hpf-Rep1---4hpf-Rep1_msc)` terminated with an error exit status (255) -- Error is ignored
+[f9/0f2624] Submitted process > mergeTomboWigsPlus (2hpf-Rep1---4hpf-Rep1_msc)
+[00/997fb6] Submitted process > compore_polish_flow:NANOCOMPORE_SAMPLE_COMPARE:sampleCompare (2hpf-Rep1 vs 4hpf-Rep1)
+[a2/6ec51b] Submitted process > epinano_flow:makeEpinanoPlots_del (2hpf-Rep1--4hpf-Rep1 del)
+[e4/53f92a] Submitted process > epinano_flow:makeEpinanoPlots_mis (2hpf-Rep1--4hpf-Rep1 mis)
+[9e/4b7b17] Submitted process > epinano_flow:makeEpinanoPlots_ins (2hpf-Rep1--4hpf-Rep1 ins)
 Pipeline BIOCORE@CRG Master of Pore completed!
-Started at  2021-09-08T19:09:59.400+02:00
-Finished at 2021-09-08T19:10:07.079+02:00
-Time elapsed: 7.7s
+Started at  2021-11-09T11:18:39.856+01:00
+Finished at 2021-11-09T11:40:39.727+01:00
+Time elapsed: 22m
 Execution status: OK
