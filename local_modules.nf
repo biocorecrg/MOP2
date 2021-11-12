@@ -716,21 +716,25 @@ def getParameters(pars_tools_file) {
 
 // Create a channel for tool options
 def parseFinalSummary(final_summary_file) {
-	final_summary = file(final_summary_file)
 	def outstring = ""
-	if( final_summary.exists() ) {
-		def allLines  = final_summary.readLines()
+	if (final_summary_file != "" ) {
+		final_summary = file(final_summary_file)
+		if( final_summary.exists() ) {
+			def allLines  = final_summary.readLines()
 
-		for( line : allLines ) {
-    		def list = line.split("=")
-    		if (list[0] == "protocol") {
-    			def vals = list[1].split(":")
-    			outstring = "--flowcell ${vals[1]} --kit ${vals[2]}"
- 		   	}  
-		}	
-	} else {
-    	log.info '***No configuration file. You must specify kit and flowcell in the parameters!!***\n'
-	}
+			for( line : allLines ) {
+				def list = line.split("=")
+				if (list[0] == "protocol") {
+					def vals = list[1].split(":")
+					outstring = "--flowcell ${vals[1]} --kit ${vals[2]}"
+				}  
+			}	
+		} else {
+			log.info '***No configuration file found!!. You must specify kit and flowcell in the parameters!!***\n'
+			} 
+		} else {
+			log.info '***No configuration file given!!. You must specify kit and flowcell in the parameters!!***\n'
+		}
 	return(outstring)
 }
 
