@@ -481,7 +481,7 @@ process bedGraphToWig {
 process mergeTomboWigs {
     label (params.LABEL)
     tag "${combID}"  
-	publishDir params.OUTPUT, pattern: "*_Tombo_Output.tsv",  mode: 'copy'
+	publishDir params.OUTPUT, pattern: "*_Tombo_Output.tsv.gz",  mode: 'copy'
 	container "biocorecrg/mopmod:0.6"
 
    input:
