@@ -70,8 +70,9 @@
 <span id="home-page-troubleshooting"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline"></a></h1>
 <section id="error-fatal-while-making-image-from-oci-registry-error-fetching-image-to-cache-while-building-sif-from">
 <h2>ERROR: <cite>FATAL: While making image from oci registry: error fetching image to cache: while building SIF from…</cite><a class="headerlink" href="#error-fatal-while-making-image-from-oci-registry-error-fetching-image-to-cache-while-building-sif-from" title="Permalink to this headline"></a></h2>
-<p>This error is caused by the filling of your singularity <strong>cachedir</strong>. To fix it you can export the following variable:</p>
+<p>This error is caused by the filling of your singularity <strong>cachedir</strong>. To fix it you can export the following variables:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export SINGULARITY_CACHEDIR=$PATH_WITH_SPACE</span>
+<span class="go">export SINGULARITY_TMPDIR=$PATH_WITH_SPACE</span>
 </pre></div>
 </div>
 <p>You might want to store your singularity images in a different place as well. You can do it by changing the singularity’s <strong>cache directory</strong> within the nextflow.global.config file</p>
