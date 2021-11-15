@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOP_TAIL &mdash; Master of Pores 2  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark" href="benchmark.html" />
+    <link rel="prev" title="MOP_PREPROCESS" href="mop_preprocess.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Master of Pores 2
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Master of Pores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mop_preprocess.html">MOP_PREPROCESS</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MOP_TAIL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#input-parameters">Input Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-run-the-pipeline">How to run the pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">CHANGELOG</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Master of Pores 2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>MOP_TAIL</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mop-tail">
+<span id="home-page-moptail"></span><h1>MOP_TAIL<a class="headerlink" href="#mop-tail" title="Permalink to this headline"></a></h1>
+<p>This module takes as input the output from MOP_PREPROCESS: basecalled fast5 reads, together with their respective fastq files, alignment and assignment read ID to gene/transcript. It outputs the estimation of poly(A) tail length at read level provided by <strong>Tailfindr</strong>, <strong>Nanopolish</strong> or both.</p>
+<section id="input-parameters">
+<h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this headline"></a></h2>
+</section>
+<section id="how-to-run-the-pipeline">
+<h2>How to run the pipeline<a class="headerlink" href="#how-to-run-the-pipeline" title="Permalink to this headline"></a></h2>
+<p>Before launching the pipeline,user should:</p>
+<ol class="arabic simple">
+<li><p>Decide which containers to use - either docker or singularity <strong>[-with-docker / -with-singularity]</strong>.</p></li>
+<li><p>Fill in both <strong>params.config</strong> and <strong>tools_opt.tsv</strong> files.</p></li>
+</ol>
+<p>To launch the pipeline, please use the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_tail.nf -with-singularity &gt; log.txt</span>
+</pre></div>
+</div>
+<p>You can run the pipeline in the background adding the nextflow parameter <strong>-bg</strong>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_tail.nf -with-singularity -bg &gt; log.txt</span>
+</pre></div>
+</div>
+<p>You can change the parameters either by changing <strong>params.config</strong> file or by feeding the parameters via command line:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_tail.nf -with-singularity -bg --output test2 &gt; log.txt</span>
+</pre></div>
+</div>
+<p>You can specify a different working directory with temporary files:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_tail.nf -with-singularity -bg -w /path/working_directory &gt; log.txt</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>In case of errors you can troubleshoot seeing the log file (log.txt) for more details. Furthermore, if more information is needed, you can also find the working directory of the process in the file. Then, access that directory indicated by the error output and check both the <strong>.command.log</strong> and <strong>.command.err</strong> files.</p></li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Once the error has been solved or if you change a specific parameter, you can resume the execution with the <strong>Netxtlow</strong> parameter <strong>- resume</strong> (only one dash!). If there was an error, the pipeline will resume from the process that had the error and proceed with the rest. If a parameter was changed, only processes affected by this parameter will be re-run.</p>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_tail.nf -with-singularity -bg -resume &gt; log_resumed.txt</span>
+</pre></div>
+</div>
+<p>To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as <em>Cached</em>, resume worked!</p>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline"></a></h2>
+<p>Several folders are created by the pipeline within the output directory specified by the <strong>output</strong> parameter:</p>
+<ol class="arabic simple">
+<li><p>NanoPolish: contains the output of <em>nanopolish</em> tool.</p></li>
+<li><p>Tailfindr: contains the output of <em>tailfindr</em> tool.</p></li>
+<li><p>PolyA_final: contains the txt files with the combined results (i.e. predicted polyA sizes). Here an example of a test:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">&quot;Read name&quot;  &quot;Tailfindr&quot;     &quot;Nanopolish&quot;    &quot;Gene Name&quot;</span>
+<span class="go">&quot;013a5dde-9c52-4de1-83eb-db70fb2cd130&quot;       52.16   49.39   &quot;YKR072C&quot;</span>
+<span class="go">&quot;01119f62-ca68-458d-aa1f-cf8c8c04cd3b&quot;       231.64  274.28  &quot;YDR133C&quot;</span>
+<span class="go">&quot;0154ce9c-fe6b-4ebc-bbb1-517fdc524207&quot;       24.05   24.24   &quot;YFL044C&quot;</span>
+<span class="go">&quot;020cde28-970d-4710-90a5-977e4b4bbc46&quot;       41.27   56.79   &quot;YGL238W&quot;</span>
+</pre></div>
+</div>
+<p>If both softwares are run, an additional plot which shows the correlation of their results is generated.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mop_preprocess.html" class="btn btn-neutral float-left" title="MOP_PREPROCESS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="benchmark.html" class="btn btn-neutral float-right" title="Benchmark" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, CRG.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
