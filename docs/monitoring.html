@@ -89,12 +89,27 @@
 <section id="live-report">
 <h2>Live report<a class="headerlink" href="#live-report" title="Permalink to this headline"></a></h2>
 <p>The execution of a pipeline run can be displayed live thanks to the <code class="docutils literal notranslate"><span class="pre">tower</span></code> web application. You need to log-in to the <a class="reference external" href="https://landing.tower.nf/">tower.nf</a> website and then follow the instructions.</p>
-<a class="reference internal image-reference" href="img/tower1.jpg"><img alt="img/tower1.jpg" src="img/tower1.jpg" style="width: 700px;" /></a>
-<a class="reference internal image-reference" href="img/tower2.jpg"><img alt="img/tower2.jpg" src="img/tower2.jpg" style="width: 700px;" /></a>
-<a class="reference internal image-reference" href="img/tower3.jpg"><img alt="img/tower3.jpg" src="img/tower3.jpg" style="width: 700px;" /></a>
-<a class="reference internal image-reference" href="img/tower4.jpg"><img alt="img/tower4.jpg" src="img/tower4.jpg" style="width: 700px;" /></a>
-<a class="reference internal image-reference" href="img/tower5.jpg"><img alt="img/tower5.jpg" src="img/tower5.jpg" style="width: 700px;" /></a>
-<a class="reference internal image-reference" href="img/tower6.jpg"><img alt="img/tower6.jpg" src="img/tower6.jpg" style="width: 700px;" /></a>
+<a class="reference internal image-reference" href="../_images/tower1.png"><img alt="../_images/tower1.png" src="../_images/tower1.png" style="width: 700px;" /></a>
+<p>You can log using one of the indicated methods:</p>
+<a class="reference internal image-reference" href="../_images/tower2.png"><img alt="../_images/tower2.png" src="../_images/tower2.png" style="width: 700px;" /></a>
+<p>Then you can generate a personal token:</p>
+<a class="reference internal image-reference" href="../_images/tower5.png"><img alt="../_images/tower5.png" src="../_images/tower5.png" style="width: 700px;" /></a>
+<a class="reference internal image-reference" href="../_images/tower6.png"><img alt="../_images/tower6.png" src="../_images/tower6.png" style="width: 700px;" /></a>
+<p>And copy it for being exported and or / stored in your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> file</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">vi $HOME/.bashrc</span>
+<span class="go">...</span>
+
+<span class="go">export TOWER_ACCESS_TOKEN=YOUR_LONG_TOKEN_GENERATED_BY_TOWER</span>
+</pre></div>
+</div>
+<p>Then you can source your <code class="docutils literal notranslate"><span class="pre">bashrc</span></code> (only needed the first time) and run your pipeline</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">source $HOME/.bashrc</span>
+<span class="go">nextflow run mop_preprocess.nf -with-report -with-docker -bg -with-tower  &gt; log.txt</span>
+</pre></div>
+</div>
+<p>Again you can log in to tower website where is shown live the progress of your pipelines!</p>
+<a class="reference internal image-reference" href="../_images/tower7.png"><img alt="../_images/tower7.png" src="../_images/tower7.png" style="width: 700px;" /></a>
+<a class="reference internal image-reference" href="../_images/tower8.png"><img alt="../_images/tower8.png" src="../_images/tower8.png" style="width: 700px;" /></a>
 </section>
 </section>
 
