@@ -83,11 +83,13 @@ include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modifica
 include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore" 
 include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
 
-include { wigToBigWig; getChromInfo; indexReference; callVariants; mean_per_pos; concat_mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
+include { wigToBigWig; getChromInfo; indexReference; callVariants; mean_per_pos; checkRef; bedGraphToWig as bedGraphToWig_msc; bedGraphToWig as bedGraphToWig_lsc } from "${local_modules}"
 include {  mergeTomboWigs as mergeTomboWigsPlus; mergeTomboWigs as mergeTomboWigsMinus} addParams(OUTPUT: outputTomboFlow) from "${local_modules}"
 include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpinanoPlots_ins; makeEpinanoPlots as makeEpinanoPlots_del } addParams(OUTPUT: outputEpinanoFlow) from "${local_modules}"
 
 include { multiToSingleFast5 } addParams(LABEL: 'big_cpus') from "${local_modules}"
+
+include { concat_mean_per_pos } addParams(LABEL: 'big_mem') from "${local_modules}" 
 
 
 

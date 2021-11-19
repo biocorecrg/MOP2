@@ -152,7 +152,8 @@ include { INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools" addP
 include { GET_VERSION as SAMTOOLS_VERSION; CAT as SAMTOOLS_CAT } from "${subworkflowsDir}/misc/samtools"
 include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus_ignore')
 include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot" 
-include { GET_VERSION as NANOCOUNT_VER ; COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
+include { GET_VERSION as NANOCOUNT_VER } from "${subworkflowsDir}/read_count/nanocount"
+include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(CONTAINER:"biocorecrg/htseq:30e9e9c", EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts, LABEL:'big_cpus')
 include { GET_VERSION as HTSEQ_VER } from "${subworkflowsDir}/read_count/htseq" addParams(CONTAINER:"biocorecrg/htseq:30e9e9c")
 
@@ -165,7 +166,7 @@ include { ASSEMBLE as ISOQUANT_ASSEMBLE } from "${subworkflowsDir}/assembly/isoq
 
 include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
-include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_cpus')
+include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_mem_cpus')
 include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}" 
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
@@ -355,7 +356,7 @@ workflow preprocess_flow {
 	}
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
-		read_counts = NANOCOUNT(sorted_alns)
+		read_counts = NANOCOUNT(sorted_alns.join(aln_indexes))
 		assignments = AssignReads(sorted_alns, "nanocount")
 		stat_counts = countStats(assignments)
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())

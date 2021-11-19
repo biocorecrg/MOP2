@@ -553,7 +553,7 @@ process wigToBigWig {
 // MOP_TAIL
 
 process collect_tailfindr_results {
-	publishDir params.OUTPUT, pattern: "*_findr.csv",  mode: 'copy'
+	publishDir params.OUTPUT, pattern: "*_findr.csv.gz",  mode: 'copy'
 	tag "${ sampleID }"  
     label (params.LABEL)
 	
@@ -561,13 +561,13 @@ process collect_tailfindr_results {
 	tuple val(sampleID), path("tailfin_*")
 	
 	output:
-    tuple val(sampleID), path("${sampleID}.findr.len"), emit: length 
-    tuple val(sampleID), file ("*_findr.csv"), emit: csv 
+    tuple val(sampleID), path("${sampleID}.findr.len.gz"), emit: length 
+    tuple val(sampleID), file ("*_findr.csv.gz"), emit: csv 
 
 	script:
 	"""
-	cat tailfin_* | awk '!(NR>1 && /tail_start/)' >>  ${sampleID}_findr.csv
-	awk -F"," '{if (\$5!="" && \$1!="read_id") print \$1"\t"\$5}' ${sampleID}_findr.csv > ${sampleID}.findr.len
+	zcat tailfin_* | awk '!(NR>1 && /tail_start/)' | gzip >>  ${sampleID}_findr.csv.gz
+	zcat ${sampleID}_findr.csv | awk -F"," '{if (\$5!="" && \$1!="read_id") print \$1"\t"\$5}'| gzip > ${sampleID}.findr.len.gz
 	"""
 
 }

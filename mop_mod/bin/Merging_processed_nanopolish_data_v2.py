@@ -37,7 +37,7 @@ def process_dicts(files):
                     coverage[key] = [int(i[5])]
 
             #Close input file:
-            #csv_file.close()
+            csv_file.close()
     
     #Data processing of data stored in both dictionaries:
     for key in intensity:

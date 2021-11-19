@@ -6,9 +6,14 @@ nanopol	<- args[2]
 assigned <- args[3]
 prefix <- args[4]
 
-a<-read.table(findr, sep="\t", header=FALSE)
-b<-read.table(nanopol, sep="\t", header=FALSE)
-g<-read.table(assigned, sep="\t", header=FALSE)
+#Arguments
+zinput1<-gzfile(findr, "rt")
+zinput2<-gzfile(nanopol, "rt")
+zinput3<-gzfile(assigned, "rt")
+
+a<-read.delim(zinput1, sep="\t", header=FALSE)
+b<-read.delim(zinput2, sep="\t", header=FALSE)
+g<-read.delim(zinput3, sep="\t", header=FALSE)
 
 c<-merge(a,b, all.x=T, by.x="V1", by.y="V1", sort=FALSE)
 d<-merge(c,g, all.x=T, by.x="V1", by.y="V1", sort=FALSE)

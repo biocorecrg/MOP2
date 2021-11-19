@@ -1,4 +1,4 @@
-# This will do biocorecrg/mopmod:0.6
+# This will do biocorecrg/mopmod:0.6.1
 FROM biocorecrg/centos-perlbrew-pyenv3-java:centos7
 
 # File Author / Maintainer
@@ -35,7 +35,7 @@ RUN bash -c 'curl -k -L https://github.com/broadinstitute/picard/releases/downlo
 RUN bash -c 'curl -k -L https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools.static.binary > /usr/local/bin/bedtools'
 RUN chmod +x /usr/local/bin/bedtools
 
-RUN pip install h5py pandas pyarrow
+RUN pip install h5py pandas pyarrow==0.12.1
 RUN pip install pyBigWig
 
 # Add wigToBigWig
