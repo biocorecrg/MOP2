@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="CHANGELOG" href="changelog.html" />
-    <link rel="prev" title="Monitoring" href="monitoring.html" /> 
+    <link rel="prev" title="MOP_TAIL" href="mop_tail.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,11 +41,12 @@
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Master of Pores</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_preprocess.html">MOP_PREPROCESS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mop_mod.html">MOP_MOD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mop_consensus.html">MOP_CONSENSUS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_tail.html">MOP_TAIL</a></li>
-<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmark</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#mop-preprocess">MOP_PREPROCESS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#mop-tail">MOP_TAIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mop-mod">MOP_MOD</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">CHANGELOG</a></li>
@@ -105,8 +106,8 @@
 <td><p>2,916</p></td>
 </tr>
 <tr class="row-odd"><td><p>Reads</p></td>
-<td><p>40,000</p></td>
-<td><p>80,000</p></td>
+<td><p>8,000</p></td>
+<td><p>16,000</p></td>
 <td><p>400,000</p></td>
 <td><p>2,000,000</p></td>
 <td><p>11,600,000</p></td>
@@ -116,34 +117,13 @@
 <td><p>18m</p></td>
 <td><p>1h 4m</p></td>
 <td><p>4h 19m</p></td>
-<td><p>10h 1m</p></td>
-</tr>
-<tr class="row-odd"><td><p>input folder space</p></td>
-<td><p>2 Gb</p></td>
-<td><p>5 Gb</p></td>
-<td><p>24 Gb</p></td>
-<td><p>118 Gb</p></td>
-<td><p>663 Gb</p></td>
-</tr>
-<tr class="row-even"><td><p>work folder space</p></td>
-<td><p>NOT MEASURED</p></td>
-<td><p>NOT MEASURED</p></td>
-<td><p>NOT MEASURED</p></td>
-<td><p>190 Gb</p></td>
-<td><p>1.1 Tb</p></td>
-</tr>
-<tr class="row-odd"><td><p>out folder space</p></td>
-<td><p>3 Gb</p></td>
-<td><p>7 Gb</p></td>
-<td><p>36 Gb</p></td>
-<td><p>178 Gb</p></td>
-<td><p>1.0 Tb</p></td>
+<td><p>x</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="mop-tail">
-<h2>MOP_TAIL<a class="headerlink" href="#mop-tail" title="Permalink to this headline"></a></h2>
+<section id="mop-mod">
+<h2>MOP_MOD<a class="headerlink" href="#mop-mod" title="Permalink to this headline"></a></h2>
 <table class="docutils align-default" id="id2">
 <caption><span class="caption-text">Dataset</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
 <colgroup>
@@ -170,32 +150,18 @@
 <td><p>2,916</p></td>
 </tr>
 <tr class="row-odd"><td><p>Reads</p></td>
-<td><p>40,000</p></td>
-<td><p>80,000</p></td>
+<td><p>8,000</p></td>
+<td><p>16,000</p></td>
 <td><p>400,000</p></td>
 <td><p>2,000,000</p></td>
 <td><p>11,600,000</p></td>
 </tr>
 <tr class="row-even"><td><p>Execution time</p></td>
-<td><p>20m</p></td>
-<td><p>20m</p></td>
-<td><p>47m</p></td>
-<td><p>5h 26m</p></td>
-<td><p>2d 1h 34m</p></td>
-</tr>
-<tr class="row-odd"><td><p>work folder space</p></td>
-<td><p>230 Mb</p></td>
-<td><p>612 Mb</p></td>
-<td><p>11 Gb</p></td>
-<td><p>240 Gb</p></td>
-<td><p>9.2 Tb xx</p></td>
-</tr>
-<tr class="row-even"><td><p>out folder space</p></td>
-<td><p>3 Mb</p></td>
-<td><p>6 Mb</p></td>
-<td><p>29 Mb</p></td>
-<td><p>153 Mb</p></td>
-<td><p>1.8 Gb xx</p></td>
+<td><p>45m</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
 </tr>
 </tbody>
 </table>
@@ -206,7 +172,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="monitoring.html" class="btn btn-neutral float-left" title="Monitoring" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mop_tail.html" class="btn btn-neutral float-left" title="MOP_TAIL" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="changelog.html" class="btn btn-neutral float-right" title="CHANGELOG" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
