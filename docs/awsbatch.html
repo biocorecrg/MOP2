@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Troubleshooting &mdash; Master of Pores 2  documentation</title>
+  <title>RUNNING IN THE AMAZON CLOUD (AWSBATCH) &mdash; Master of Pores 2  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,7 +17,9 @@
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark" href="benchmark.html" />
+    <link rel="prev" title="Monitoring" href="monitoring.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -35,13 +37,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Master of Pores</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_preprocess.html">MOP_PREPROCESS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_tail.html">MOP_TAIL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
-<li class="toctree-l1"><a class="reference internal" href="awsbatch.html">RUNNING IN THE AMAZON CLOUD (AWSBATCH)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">RUNNING IN THE AMAZON CLOUD (AWSBATCH)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-your-credentials">Setting your credentials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#copying-input-files-to-s3-bucket">Copying input files to S3 bucket</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">CHANGELOG</a></li>
 </ul>
@@ -60,7 +66,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Troubleshooting</li>
+      <li>RUNNING IN THE AMAZON CLOUD (AWSBATCH)</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -69,30 +75,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="troubleshooting">
-<span id="home-page-troubleshooting"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline"></a></h1>
-<section id="error-fatal-while-making-image-from-oci-registry-error-fetching-image-to-cache-while-building-sif-from">
-<h2>ERROR: <cite>FATAL: While making image from oci registry: error fetching image to cache: while building SIF from…</cite><a class="headerlink" href="#error-fatal-while-making-image-from-oci-registry-error-fetching-image-to-cache-while-building-sif-from" title="Permalink to this headline"></a></h2>
-<p>This error is caused by the filling of your singularity <strong>cachedir</strong>. To fix it you can export the following variables:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export SINGULARITY_CACHEDIR=$PATH_WITH_SPACE</span>
-<span class="go">export SINGULARITY_TMPDIR=$PATH_WITH_SPACE</span>
-</pre></div>
-</div>
-<p>You might want to store your singularity images in a different place as well. You can do it by changing the singularity’s <strong>cache directory</strong> within the nextflow.global.config file</p>
-<div class="highlight-groovy notranslate"><div class="highlight"><pre><span></span><span class="n">singularity</span><span class="o">.</span><span class="na">cacheDir</span> <span class="o">=</span> <span class="s2">&quot;/mnt/class-bucket-1/singularity&quot;</span>
-</pre></div>
-</div>
-<p>Finally you might end up filling your /tmp directory. You can change it by setting a new one</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export TMPDIR=$PATH_WITH_SPACE</span>
-</pre></div>
-</div>
+  <section id="running-in-the-amazon-cloud-awsbatch">
+<span id="home-page-awsbatch"></span><h1>RUNNING IN THE AMAZON CLOUD (AWSBATCH)<a class="headerlink" href="#running-in-the-amazon-cloud-awsbatch" title="Permalink to this headline"></a></h1>
+<p>To run MOP2 in the amazon cloud you need to login to a entry point. Then you can clone the repository and install the files as indicated in the INSTALL section and finally copy the input files in a S3 bucket.</p>
+<section id="setting-your-credentials">
+<h2>Setting your credentials<a class="headerlink" href="#setting-your-credentials" title="Permalink to this headline"></a></h2>
+<p>TONI ADD HERE</p>
+</section>
+<section id="copying-input-files-to-s3-bucket">
+<h2>Copying input files to S3 bucket<a class="headerlink" href="#copying-input-files-to-s3-bucket" title="Permalink to this headline"></a></h2>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="monitoring.html" class="btn btn-neutral float-left" title="Monitoring" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="benchmark.html" class="btn btn-neutral float-right" title="Benchmark" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
