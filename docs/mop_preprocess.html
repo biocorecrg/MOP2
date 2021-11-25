@@ -43,6 +43,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MOP_PREPROCESS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#input-parameters">Input Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-run-the-pipeline">How to run the pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-models">Custom models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
 </ul>
 </li>
@@ -212,6 +213,10 @@
 <p class="admonition-title">Note</p>
 <p>To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning.</p>
 </div>
+</section>
+<section id="custom-models">
+<h2>Custom models<a class="headerlink" href="#custom-models" title="Permalink to this headline"></a></h2>
+<p>Custom models for demultiplexing with Deeplexicon can be added to the <strong>mop_preprocess/deeplexicon</strong> folder. Custom models for basecalling with Guppy can be added to <strong>mop_preprocess/bin/ont-guppy/data</strong>. You can indicate the use of those models via custom command line parameters within <strong>_opt.tsv</strong> files. As an example you can indicate <strong>“-c rna_r9.4.1_70bps_m6A_hac.cfg”</strong> for basecalling        with Guppy and <strong>“-f multi -m resnet20-final.h5”</strong> for demultiplexing with deeplexicon.</p>
 </section>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Permalink to this headline"></a></h2>
