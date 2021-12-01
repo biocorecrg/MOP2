@@ -84,6 +84,14 @@
 </section>
 <section id="copying-input-files-to-s3-bucket">
 <h2>Copying input files to S3 bucket<a class="headerlink" href="#copying-input-files-to-s3-bucket" title="Permalink to this headline"></a></h2>
+<p>You can copy the input files to a S3 bucket in this way:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">aws s3 --profile s3upload cp --recursive YOURFOLDER s3://mop2-bucket-1/data/YOURFOLDER</span>
+</pre></div>
+</div>
+<p>Then you need to log to the entry point and launch the pipeline as indicated follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -bg -with-docker -profile awsbatch &gt; log</span>
+</pre></div>
+</div>
 </section>
 </section>
 
