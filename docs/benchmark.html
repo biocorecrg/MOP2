@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="awsbatch.html">RUNNING IN THE AMAZON CLOUD (AWSBATCH)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmark</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#mop-preprocess">MOP_PREPROCESS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mop-mod">MOP_MOD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mop-tail">MOP_TAIL</a></li>
 </ul>
 </li>
@@ -143,10 +144,68 @@
 </tbody>
 </table>
 </section>
-<section id="mop-tail">
-<h2>MOP_TAIL<a class="headerlink" href="#mop-tail" title="Permalink to this headline"></a></h2>
+<section id="mop-mod">
+<h2>MOP_MOD<a class="headerlink" href="#mop-mod" title="Permalink to this headline"></a></h2>
 <table class="docutils align-default" id="id2">
 <caption><span class="caption-text">Dataset</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td></td>
+<td><p>Toy sample</p></td>
+<td><p>Flongle</p></td>
+<td><p>MinION</p></td>
+<td><p>gridION</p></td>
+<td><p>PromethION</p></td>
+</tr>
+<tr class="row-even"><td><p>Fast5 files</p></td>
+<td><p>10</p></td>
+<td><p>20</p></td>
+<td><p>100</p></td>
+<td><p>500</p></td>
+<td><p>2,916</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reads</p></td>
+<td><p>40,000</p></td>
+<td><p>80,000</p></td>
+<td><p>400,000</p></td>
+<td><p>2,000,000</p></td>
+<td><p>11,600,000</p></td>
+</tr>
+<tr class="row-even"><td><p>Execution time</p></td>
+<td><p>25m</p></td>
+<td></td>
+<td><p>4h 52m</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>work folder space</p></td>
+<td><p>327 Mb</p></td>
+<td></td>
+<td><p>192 Gb</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>out folder space</p></td>
+<td><p>460 Mb</p></td>
+<td></td>
+<td><p>7.2 Gb</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mop-tail">
+<h2>MOP_TAIL<a class="headerlink" href="#mop-tail" title="Permalink to this headline"></a></h2>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Dataset</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 17%" />
 <col style="width: 17%" />
