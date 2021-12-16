@@ -1,6 +1,6 @@
 # MoP2- DSL2 version of Master of Pores
 
-![MOP2](https://github.com/biocorecrg/MoP2/blob/master/img/master_red.jpg?raw=true)
+![MOP2](https://github.com/biocorecrg/MoP2/blob/main/img/master_red.jpg?raw=true)
 
 
 Inspired by Metallica's [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
