@@ -209,11 +209,12 @@ workflow flow1 {
 workflow flow2 {		
     take: 
     	fast5_4_analysis
+        deep_models
     main:
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
 			outbc = GUPPY_BASECALL(fast5_4_analysis)
-			demux = DEMULTIPLEX_DEEPLEXICON(fast5_4_analysis)
+			demux = DEMULTIPLEX_DEEPLEXICON(deep_models, fast5_4_analysis)
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
@@ -439,7 +440,8 @@ workflow preprocess_simple {
    			break
    			case "graphmap2": 
    			aln_reads = GRAPHMAP2(bc_fastq, reference)
-   			case "minimap2": 
+   			break
+                        case "minimap2": 
    			aln_reads = MINIMAP2(bc_fastq, reference)
    			break
    			case "bwa": 
@@ -511,6 +513,8 @@ workflow preprocess_simple {
 
  workflow {
  	if (params.fast5 != "" && params.fastq == "") {
+                Channel
+                        .fromPath("${projectDir}/deeplexicon/*.h5").collect().set{deep_models}
 
 		Channel
 			.fromPath( params.fast5)                                             
@@ -539,7 +543,7 @@ workflow preprocess_simple {
 
 		//GET_WORKFLOWS(params.flowcell, params.kit).view()
 		if (params.basecalling == "guppy" && params.demultiplexing == "NO" ) outf = flow1(fast5_4_analysis)
-		else outf = flow2(fast5_4_analysis)
+                else outf = flow2(fast5_4_analysis, deep_models)
 		def bc_fast5 = outf.basecalled_fast5
 		def bc_fastq = outf.basecalled_fastq
 		def basecalled_stats = outf.basecalled_stats

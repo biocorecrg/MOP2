@@ -13,7 +13,7 @@ params {
     granularity         = 1
 
     basecalling         = "guppy"
-    GPU                 = "ON"
+    GPU                 = "OFF"
     demultiplexing      = "deeplexicon"
     demulti_fast5       = "YES" 
 
