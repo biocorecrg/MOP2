@@ -74,6 +74,7 @@ How to run the pipeline
 Before launching the pipeline, user should decide which containers to use - either docker or singularity **[-with-docker / -with-singularity]**.
 
 Then, to launch the pipeline, please use the following command:
+
 .. code-block:: console
 
    nextflow run mop_preprocess.nf -with-singularity > log.txt

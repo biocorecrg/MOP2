@@ -184,11 +184,11 @@ workflow flow1 {
 
 		// Optional fastq filtering	
 		if (params.filtering == "nanofilt") {
-			nanofilt = NANOFILT_FILTER(outbc.basecalled_fastq)
-			basecalled_fastq = reshapeSamples(nanofilt.out)
+			basecalled_fastq = NANOFILT_FILTER(outbc.basecalled_fastq)
+			//basecalled_fastq = reshapeSamples(nanofilt.out)
 		} else if (params.filtering == "nanoq") {
-			nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
-			basecalled_fastq = reshapeSamples(nanofilt.out)
+			basecalled_fastq = NANOQ_FILTER(outbc.basecalled_fastq)
+			//basecalled_fastq = reshapeSamples(nanofilt.out)
 		}
 		
  	    //bc_fastq = reshapeSamples(basecalled_fastq)
@@ -436,7 +436,8 @@ workflow preprocess_simple {
 	else {
 		switch(params.mapping) { 
    			case "graphmap": 
-   			aln_reads = GRAPHMAP(bc_fastq, reference)
+   			dna_bc_fastq = RNA2DNA(bc_fastq)
+                        aln_reads = GRAPHMAP(dna_bc_fastq, reference)
    			break
    			case "graphmap2": 
    			aln_reads = GRAPHMAP2(bc_fastq, reference)
