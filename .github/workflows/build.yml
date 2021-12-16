@@ -1,0 +1,43 @@
+name: mop2-CI
+# This workflow is triggered on pushes to the repository.
+on: [push]
+
+jobs:
+  build:
+    name: mop2 ci
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        java_version: ['11.0.4']
+
+    steps:
+      - name: Environment
+        run: env | sort
+
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java_version }}
+          architecture: x64
+
+      - name: MOP2
+        run: |
+          curl -fsSL get.nextflow.io | bash
+          # Install Master Of Pores 2
+          git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MOP2.git
+          cd MOP2
+          sh INSTALL.sh
+          cd mop_preprocess 
+          ../../nextflow run mop_preprocess.nf -with-docker -profile local
+
+        env:
+          NXF_ANSI_LOG: false
