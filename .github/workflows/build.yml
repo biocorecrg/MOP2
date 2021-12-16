@@ -35,7 +35,7 @@ jobs:
           # Install Master Of Pores 2
           git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MOP2.git
           cd MOP2
-          sh INSTALL.sh
+          bash INSTALL.sh
           cd mop_preprocess 
           ../../nextflow run mop_preprocess.nf -with-docker -profile local
 
