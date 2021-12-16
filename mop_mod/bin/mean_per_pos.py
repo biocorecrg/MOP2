@@ -1,1 +1,0 @@
-mean_per_pos_v2.py
