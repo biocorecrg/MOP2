@@ -1,7 +1,24 @@
-GUPPY_VER='3.4.5'
+#!/bin/bash
+#
+# This script will download and install gouppy
+# params:
+# 1 guppy version
 
-echo "INSTALLING GUPPY VERSION ${GUPPY_VER}"
+if [ x"$1" == x ]; then
+        GUPPY_VER='3.4.5'
+else
+	GUPPY_VER=$1
+fi
+
+
 wget https://mirror.oxfordnanoportal.com/software/analysis/ont-guppy_${GUPPY_VER}_linux64.tar.gz 
+if [ $? -eq 0 ]; then
+	echo "INSTALLING GUPPY VERSION ${GUPPY_VER}"
+else
+    echo "GUPPY VERSION ${GUPPY_VER} is not found" 
+    exit
+fi
+
 tar -zvxf ont-guppy_${GUPPY_VER}_linux64.tar.gz
 mv ont-guppy mop_preprocess/bin/
 cd mop_preprocess/bin
