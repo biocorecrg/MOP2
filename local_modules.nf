@@ -320,6 +320,45 @@ process checkRef {
 }
 
 // MOP_MOD and MOP_TAIL
+process splitReference {
+    label (params.LABEL)
+    container 'biocorecrg/mopmod:0.6.2'
+    tag "Splitting of ${ reference }"
+
+    input:
+    path(reference)
+
+    output:
+    path("pieces*.fa")
+
+    script:
+    """
+    faSplit about ${reference} 20000000 pieces
+    """
+}
+
+process splitBams {
+    label (params.LABEL)
+    container 'biocorecrg/mopmod:0.6.2'
+    tag "Splitting of ${ bams } on ${ref_piece}"
+
+    input:
+    tuple val(combid), path(bams), path(ref_piece)
+
+    output:
+    tuple val(combid), path("${combid}_s.bam"), path("${combid}_s.bam.bai")
+
+    script:
+    """
+		samtools faidx ${ref_piece} 
+		awk '{OFS="	"}{print \$1, "1", \$2}' ${ref_piece}.fai > ${ref_piece}.bed
+		samtools view -@ ${task.cpus} ${bams} -L ${ref_piece}.bed -S | samtools view -Sb -t ${ref_piece}.fai -@ ${task.cpus} -o ${combid}.bam
+   		samtools sort -@ ${task.cpus} -o ${combid}_s.bam ${combid}.bam
+		samtools index ${combid}_s.bam
+		rm ${combid}.bam
+    """
+
+}
 
 process indexReference {
     label (params.LABEL)
@@ -330,14 +369,40 @@ process indexReference {
     path(reference)
     
     output:
-    tuple path("*.dict"), path ("*.fai")
+    tuple val("${reference.simpleName}"), path(reference), path("*.dict"), path ("*.fai")
     
     script:
 	"""
-	\$PICARD CreateSequenceDictionary R=${reference} O=reference.dict
+	\$PICARD CreateSequenceDictionary R=${reference} O=${reference}.dict
 	samtools faidx ${reference}
 	"""
 }
+
+process joinEpinanoRes {
+    label (params.LABEL)
+    container 'biocorecrg/mopmod:0.6.2'
+    tag "joining on ${id}"
+    publishDir(params.OUTPUT, mode:'copy') 
+
+    input:
+    tuple val(id), path(epinanores)
+    
+    output:
+    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: plusepi 
+    tuple val(id), path("*.plus_strand.per.site.csv.gz"), emit: minusepi 
+
+    
+    script:
+	"""
+	if compgen -G "*.plus_strand.per.site.csv.gz" > /dev/null; then
+		zcat *.plus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.plus_strand.per.site.csv.gz
+	fi
+	if compgen -G "*.minus_strand.per.site.csv.gz" > /dev/null; then
+		zcat *.minus_strand.per.site.csv.gz | awk '!(NR>1 && /#Ref/)' | gzip >>  ${id}.minus_strand.per.site.csv.gz
+	fi	
+	"""
+}
+
 
 /*
 * 
@@ -376,6 +441,7 @@ process concat_mean_per_pos {
     container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
     tag "${idsample}" 
+    publishDir(params.OUTPUT, mode:'copy') 
 	
     input:
     tuple val(idsample), path(event_align) 

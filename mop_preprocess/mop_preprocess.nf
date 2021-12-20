@@ -78,11 +78,15 @@ if( !reference.exists() ) exit 1, "Missing reference file: ${reference}!"
 config_report = file("$baseDir/config.yaml")
 if( !config_report.exists() ) exit 1, "Missing config.yaml file!"
 logo = file("$baseDir/../img/logo_small.png")
+Channel.fromPath( "$baseDir/deeplexicon/*.h5").set{deepmodels}
 
+
+Channel
+    .from( config_report, logo )
+    .collect().set{multiqc_info}
 
 
 def gpu				    = params.GPU
-
 def tools = [:]
 tools["basecalling"] = params.basecalling
 tools["demultiplexing"] = params.demultiplexing
@@ -114,16 +118,21 @@ if (params.ref_type == "genome") {
 		if( !annotation.exists() ) exit 1, "Missing annotation file: ${params.annotation}!"
 	}
 }
- 
+def demulti_fast5_opt = "OFF"
+if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
+	demulti_fast5_opt = "ON"
+}
+
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
-def output_bc = (params.demulti_fast5 == 'ON' ? '' : outputFast5)
+def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 
 
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
 include { RNA2DNA; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { extracting_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUT: outputFast5)
 
 def guppypars = parseFinalSummary(params.conffile)
 
@@ -153,7 +162,7 @@ include { GET_VERSION as SAMTOOLS_VERSION; CAT as SAMTOOLS_CAT } from "${subwork
 include { MOP_QC as NANOPLOT_QC } from "${subworkflowsDir}/qc/nanoplot" addParams(LABEL: 'big_cpus_ignore')
 include { GET_VERSION as NANOPLOT_VER } from "${subworkflowsDir}/qc/nanoplot" 
 include { GET_VERSION as NANOCOUNT_VER } from "${subworkflowsDir}/read_count/nanocount"
-include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
+include { COUNT as NANOCOUNT } from "${subworkflowsDir}/read_count/nanocount" addParams(LABEL: 'big_mem', EXTRAPARS: progPars["counting--nanocount"], OUTPUT:outputCounts)
 include { COUNT_AND_ANNO as HTSEQ_COUNT } from "${subworkflowsDir}/read_count/htseq" addParams(CONTAINER:"biocorecrg/htseq:30e9e9c", EXTRAPARS: progPars["counting--htseq"], OUTPUT:outputCounts, LABEL:'big_cpus')
 include { GET_VERSION as HTSEQ_VER } from "${subworkflowsDir}/read_count/htseq" addParams(CONTAINER:"biocorecrg/htseq:30e9e9c")
 
@@ -164,7 +173,7 @@ include { GET_VERSION as ISOQUANT_VER } from "${subworkflowsDir}/assembly/isoqua
 include { ASSEMBLE as ISOQUANT_ASSEMBLE } from "${subworkflowsDir}/assembly/isoquant" addParams(EXTRAPARS: progPars["discovery--isoquant"], OUTPUT:outputAssembly, LABEL:'big_mem_cpus')
 
 
-include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report}", OUTPUT:outputMultiQC)
+include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report.getName()}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
 include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_mem_cpus')
 include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}" 
@@ -209,16 +218,15 @@ workflow flow1 {
 workflow flow2 {		
     take: 
     	fast5_4_analysis
-        deep_models
     main:
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
 			outbc = GUPPY_BASECALL(fast5_4_analysis)
-			demux = DEMULTIPLEX_DEEPLEXICON(deep_models, fast5_4_analysis)
+			demux = DEMULTIPLEX_DEEPLEXICON(deepmodels, fast5_4_analysis)
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
-			if (params.demulti_fast5 == "ON" ) {
+			if (demulti_fast5_opt == "ON") {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
 				fast5_res = extracting_demultiplexed_fast5_deeplexicon(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
@@ -238,7 +246,7 @@ workflow flow2 {
 			fast5_res = outbc.basecalled_fast5
 
 			// Optional demultiplex fast5 		
-			if (params.demulti_fast5 == "ON" ) {
+			if (demulti_fast5_opt == "ON" ) {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(outbc.basecalling_stats)								
 				fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
@@ -279,7 +287,7 @@ workflow preprocess_flow {
 	main:	
 	// Perform MinIONQC on basecalling stats
 	basecall_qc = MinIONQC(basecalled_stats.groupTuple())	
-	multiqc_data = Channel.from(logo).mix(basecall_qc.QC_folder.map{it[1]})
+	multiqc_data = basecall_qc.QC_folder.map{it[1]}.mix(multiqc_info)
 
 	// Perform mapping on fastq files
 	if (params.mapping == "NO") {
@@ -506,7 +514,7 @@ workflow preprocess_simple {
 
 	// Perform MULTIQC report
 	fastqc_files.map{it[1]}.set{qcs}
-	all_res = qcs.mix(stats_counts, stats_aln, Channel.from(logo))
+	all_res = qcs.mix(multiqc_info,stats_counts, stats_aln)
 	MULTIQC(all_res.collect())
 	
 }
@@ -514,8 +522,6 @@ workflow preprocess_simple {
 
  workflow {
  	if (params.fast5 != "" && params.fastq == "") {
-                Channel
-                        .fromPath("${projectDir}/deeplexicon/*.h5").collect().set{deep_models}
 
 		Channel
 			.fromPath( params.fast5)                                             
@@ -544,7 +550,7 @@ workflow preprocess_simple {
 
 		//GET_WORKFLOWS(params.flowcell, params.kit).view()
 		if (params.basecalling == "guppy" && params.demultiplexing == "NO" ) outf = flow1(fast5_4_analysis)
-                else outf = flow2(fast5_4_analysis, deep_models)
+		else outf = flow2(fast5_4_analysis)
 		def bc_fast5 = outf.basecalled_fast5
 		def bc_fastq = outf.basecalled_fastq
 		def basecalled_stats = outf.basecalled_stats
@@ -573,11 +579,11 @@ workflow preprocess_simple {
  		
  	}
 
-	all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
-	.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
-	.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
-	.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
-	.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
+	//all_ver = BAMBU_VER().mix(DEMULTIPLEX_VER()).mix(NANOQ_VER()).mix(NANOFILT_VER())
+	//.mix(GRAPHMAP_VER()).mix(GRAPHMAP2_VER())
+	//.mix(MINIMAP2_VER()).mix(BWA_VER()).mix(FASTQC_VER())
+	//.mix(SAMTOOLS_VERSION()).mix(NANOPLOT_VER()).mix(NANOCOUNT_VER()).mix(HTSEQ_VER()).mix(MULTIQC_VER())
+	//.collectFile(name: 'tool_version.txt', newLine: false, storeDir:outputMultiQC)
  	
  
  }
