@@ -28,14 +28,18 @@ process extracting_demultiplexed_fast5_deeplexicon {
     label (params.LABEL)
 	container 'lpryszcz/deeplexicon:1.2.0'
     tag "${ idfile }"
-    if (params.saveSpace == "YES") publishDir(params.OUTPUT, mode:'move') 
-    else publishDir(params.OUTPUT, mode:'copy')    
+    if (params.saveSpace == "YES") publishDir(params.OUTPUTF5, mode:'move', pattern: '*-*') 
+    else publishDir(params.OUTPUTF5, mode:'copy', pattern: '*-*')    
+
+    publishDir(params.OUTPUTST, mode:'copy', pattern: 'summaries/*_final_summary.stats', saveAs: { file -> "${file.split('\\/')[-1]}" })    
+
 		
 	input:
 	tuple val(idfile), path("demux_*"), file("*")
 
 	output:
-	file("${idfile}-*")
+	path("${idfile}-*"), type: "dir", emit: dem_fast5
+	path("summaries/*_final_summary.stats"), emit: dem_summaries
 	
 	script:
 	"""
@@ -43,7 +47,8 @@ process extracting_demultiplexed_fast5_deeplexicon {
 	awk '{print \$2 > \$3".list" }' dem.files
 	for i in *.list; do mkdir ${idfile}---`basename \$i .list`; fast5_subset --input ./ --save_path ${idfile}---`basename \$i .list`/ --read_id_list \$i --batch_size 4000 -c vbz -t ${task.cpus}; done 
 	rm *.list
-	rm */filename_mapping.txt
+	mkdir summaries
+	for i in */filename_mapping.txt; do mv \$i `echo \$i | awk -F"/" '{print "summaries/"\$1"_final_summary.stats"}'`; done
 	rm dem.files 
 	"""
 } 
@@ -61,7 +66,7 @@ process extracting_demultiplexed_fast5_guppy {
 	tuple val(idfile), path("summaries_*"), file("*")
     
 	output:
-	file("${idfile}-*")
+	path("${idfile}-*")
 
     script:
     """
@@ -129,7 +134,7 @@ process MinIONQC {
     label (params.LABEL)
     container 'biocorecrg/mopprepr:0.7'
     errorStrategy 'ignore'
-    publishDir(params.OUTPUT, mode:'copy', pattern: '*.stats') 
+    if (params.OUTPUT != "") publishDir(params.OUTPUT, mode:'copy', pattern: '*.stats') 
 
     
     input:
