@@ -48,7 +48,8 @@ process extracting_demultiplexed_fast5_deeplexicon {
 	for i in *.list; do mkdir ${idfile}---`basename \$i .list`; fast5_subset --input ./ --save_path ${idfile}---`basename \$i .list`/ --read_id_list \$i --batch_size 4000 -c vbz -t ${task.cpus}; done 
 	rm *.list
 	mkdir summaries
-	for i in */filename_mapping.txt; do mv \$i `echo \$i | awk -F"/" '{print "summaries/"\$1"_final_summary.stats"}'`; done
+	for i in */filename_mapping.txt; do awk 'BEGIN{print "filename\tread_id"}{print \$2"\t"\$1}' \$i > `echo \$i | awk -F"/" '{print "summaries/"\$1"_final_summary.stats"}'`; done
+	rm */filename_mapping.txt;
 	rm dem.files 
 	"""
 } 
