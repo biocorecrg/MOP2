@@ -31,7 +31,7 @@ or
 
 .. code-block:: console
 
-  cd MoP2; bash INSTALL.sh 4.4.2
+  cd MoP2; bash INSTALL.sh 4.0.15
  
  
 Testing
