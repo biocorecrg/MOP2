@@ -126,13 +126,13 @@ if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
 def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
-
+def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
 include { RNA2DNA; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
-include { extracting_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUT: outputFast5, LABEL: 'big_cpus')
+include { extracting_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
 
 def guppypars = parseFinalSummary(params.conffile)
 
@@ -172,10 +172,9 @@ include { ASSEMBLE as BAMBU_ASSEMBLE } from "${subworkflowsDir}/assembly/bambu" 
 include { GET_VERSION as ISOQUANT_VER } from "${subworkflowsDir}/assembly/isoquant" 
 include { ASSEMBLE as ISOQUANT_ASSEMBLE } from "${subworkflowsDir}/assembly/isoquant" addParams(EXTRAPARS: progPars["discovery--isoquant"], OUTPUT:outputAssembly, LABEL:'big_mem_cpus')
 
-
 include { REPORT as MULTIQC; GET_VERSION as MULTIQC_VER } from "${subworkflowsDir}/reporting/multiqc" addParams(EXTRAPARS: "-c ${config_report.getName()}", OUTPUT:outputMultiQC)
 include { concatenateFastQFiles} from "${local_modules}" addParams(OUTPUT:outputFastq)
-include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputQual, LABEL: 'big_mem_cpus')
+include { MinIONQC} from "${local_modules}" addParams(OUTPUT:outputMinionQC, LABEL: 'big_mem_cpus')
 include { bam2stats; countStats; joinCountStats; joinAlnStats} from "${local_modules}" 
 include { cleanFile as fastqCleanFile; cleanFile as bamCleanFile; cleanFile as fast5CleanFile} from "${local_modules}"
 include { AssignReads} from "${local_modules}" addParams(OUTPUT:outputAssigned)
@@ -229,7 +228,8 @@ workflow flow2 {
 			if (demulti_fast5_opt == "ON") {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
-				fast5_res = extracting_demultiplexed_fast5_deeplexicon(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
+				data_for_demux = alldemux.groupTuple().join(basecalledbc.transpose().groupTuple())
+				out_demux = extracting_demultiplexed_fast5_deeplexicon(data_for_demux)
 				
 				// OPTIONAL CLEANING FASTQ5 FILES
 				if (params.saveSpace == "YES") {
@@ -250,12 +250,9 @@ workflow flow2 {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(outbc.basecalling_stats)								
 				fast5_res = extracting_demultiplexed_fast5_guppy(alldemux.groupTuple().join(basecalledbc.transpose().groupTuple()))
-				
 				// OPTIONAL CLEANING FASTQ5 FILES
 				fast5CleanFile(basecalledbc.transpose().groupTuple(), fast5_res.map{it[1]}.collect(), ".fast5")
 			}
-
-
 		}
 		reshapedDemufq = demufq.transpose().map{
 			[it[1].name.replace(".fastq.gz", ""), it[1] ]
@@ -268,13 +265,12 @@ workflow flow2 {
 			nanofilt = NANOQ_FILTER(outbc.basecalled_fastq)
 			basecalled_fastq = reshapeSamples(nanofilt.out)
 		}
-
 	emit:
     	basecalled_fast5 =  fast5_res
     	//basecalled_fastq = basecalled_fastq_res
     	basecalled_fastq = reshapedDemufq
     	basecalled_stats = reshapeSamples(outbc.basecalling_stats)
-	
+    		
 }
 
 
