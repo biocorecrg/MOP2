@@ -4,8 +4,8 @@ export TF_VAR_instance_type=t2.small
 # Image used for entrypoint
 export TF_VAR_ami_entrypoint=ami-0cf1f74891140b374
 # Image used for setting in the cluster
-export TF_VAR_ami_batch=ami-016c54e34f1a6f80d
-export TF_VAR_ami_batch_gpu=ami-07c1a1e7ca2343f3f
+export TF_VAR_ami_batch=ami-06b8c6e4fe388181d
+export TF_VAR_ami_batch_gpu=ami-06b8c6e4fe388181d
 # Region
 export TF_VAR_region=eu-central-1
 export TF_VAR_profile=default
