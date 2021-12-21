@@ -60,10 +60,17 @@ variable "bucket_prefix" {
   default = "class-bucket"
 }
 
+
 provider "aws" {
   profile                 = var.profile
   shared_credentials_file = var.credentials
   region                  = var.region
+}
+
+// Random resource for naming
+resource "random_string" "rand" {
+  length  = 8
+  special = false
 }
 
 // You may define an entry point for convenience
@@ -73,10 +80,10 @@ resource "aws_instance" "classroom" {
   ami                  = var.ami_entrypoint
   count                = var.instance_count
   instance_type        = var.instance_type
-  iam_instance_profile = "Multiprofile" //TODO: Change to aws_iam_instance_profile.Multiprofile.name
+  iam_instance_profile = aws_iam_instance_profile.Multiprofile.name
   key_name             = var.key_name
-  security_groups      = ["allow_ssh", "allow_http", "allow_shiny"]
-  user_data            = templatefile("ec2init.sh.tpl", { region = var.region, ec2_password = var.ec2_password, bucket_acl = var.bucket_acl, bucket_prefix = var.bucket_prefix, repourl = var.repourl, count = count.index + 1 })
+  security_groups      = ["allow_ssh-${random_string.rand.result}", "allow_http-${random_string.rand.result}", "allow_shiny-${random_string.rand.result}"]
+  user_data            = templatefile("ec2init.sh.tpl", { region = var.region, ec2_password = var.ec2_password, bucket_acl = var.bucket_acl, bucket_prefix = var.bucket_prefix, repourl = var.repourl, rand = random_string.rand.result, count = count.index + 1 })
   root_block_device {
     volume_size = var.instance_volume_size
   }

@@ -1,10 +1,8 @@
 //security.tf
 
-// TODO: Add prefix to names for avoiding clashes
-
 resource "aws_security_group" "allow_ssh" {
 
-  name        = "allow_ssh"
+  name        = "allow_ssh-${random_string.rand.result}"
   description = "default ssh (22) access with Terraform"
   ingress {
     cidr_blocks = [
@@ -24,7 +22,7 @@ resource "aws_security_group" "allow_ssh" {
 
 resource "aws_security_group" "allow_http" {
 
-  name        = "allow_http"
+  name        = "allow_http-${random_string.rand.result}"
   description = "default HTTP (80) access with Terraform"
   ingress {
     cidr_blocks = [
@@ -44,7 +42,7 @@ resource "aws_security_group" "allow_http" {
 
 resource "aws_security_group" "allow_shiny" {
 
-  name        = "allow_shiny"
+  name        = "allow_shiny-${random_string.rand.result}"
   description = "default shiny (3838) access with Terraform"
   ingress {
     cidr_blocks = [
@@ -64,7 +62,7 @@ resource "aws_security_group" "allow_shiny" {
 
 resource "aws_security_group" "allow_all" {
 
-  name        = "allow_all"
+  name        = "allow_all-${random_string.rand.result}"
   description = "default VPC security group with Terraform"
   ingress {
     from_port   = 0
@@ -82,7 +80,7 @@ resource "aws_security_group" "allow_all" {
 
 // Role for the cluster
 resource "aws_iam_role" "ClusterRole" {
-  name = "ClusterRole"
+  name = "ClusterRole-${random_string.rand.result}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -107,7 +105,7 @@ resource "aws_iam_role" "ClusterRole" {
 
 // Role for the cluster nodes
 resource "aws_iam_role" "ComputeInstanceRole" {
-  name = "ComputeInstanceRole"
+  name = "ComputeInstanceRole-${random_string.rand.result}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -125,7 +123,7 @@ resource "aws_iam_role" "ComputeInstanceRole" {
 
 // Additional role for fleeting cluster nodes
 resource "aws_iam_role" "ClusterFleetRole" {
-  name = "ClusterFleetRole"
+  name = "ClusterFleetRole-${random_string.rand.result}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -151,7 +149,7 @@ resource "aws_iam_role" "ClusterFleetRole" {
 
 // Role for the entrypoint
 resource "aws_iam_role" "Multiaccess" {
-  name = "Multiaccess"
+  name = "Multiaccess-${random_string.rand.result}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -175,18 +173,18 @@ resource "aws_iam_role" "Multiaccess" {
 }
 
 resource "aws_iam_instance_profile" "ComputeInstanceProfile" {
-  name = "ComputeInstanceProfile"
+  name = "ComputeInstanceProfile-${random_string.rand.result}"
   role = aws_iam_role.ComputeInstanceRole.name
 }
 
 resource "aws_iam_instance_profile" "Multiprofile" {
-  name = "Multiprofile"
+  name = "Multiprofile-${random_string.rand.result}"
   role = aws_iam_role.Multiaccess.name
 }
 
 resource "aws_iam_policy_attachment" "AWSBatchServiceRole-policy-attachment" {
 
-  name       = "AWSBatchServiceRole-policy-attachment"
+  name       = "AWSBatchServiceRole-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
   groups     = []
   users      = []
@@ -196,7 +194,7 @@ resource "aws_iam_policy_attachment" "AWSBatchServiceRole-policy-attachment" {
 
 resource "aws_iam_policy_attachment" "AWSTransferLoggingAccess-policy-attachment" {
 
-  name       = "AWSTransferLoggingAccess-policy-attachment"
+  name       = "AWSTransferLoggingAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
   groups     = []
   users      = []
@@ -206,7 +204,7 @@ resource "aws_iam_policy_attachment" "AWSTransferLoggingAccess-policy-attachment
 
 resource "aws_iam_policy_attachment" "AmazonEC2ContainerServiceAutoscaleRole-policy-attachment" {
 
-  name       = "AmazonEC2ContainerServiceAutoscaleRole-policy-attachment"
+  name       = "AmazonEC2ContainerServiceAutoscaleRole-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
   groups     = []
   users      = []
@@ -216,7 +214,7 @@ resource "aws_iam_policy_attachment" "AmazonEC2ContainerServiceAutoscaleRole-pol
 
 resource "aws_iam_policy_attachment" "CloudWatchLogsFullAccess-policy-attachment" {
 
-  name       = "CloudWatchLogsFullAccess-policy-attachment"
+  name       = "CloudWatchLogsFullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
   groups     = []
   users      = []
@@ -226,7 +224,7 @@ resource "aws_iam_policy_attachment" "CloudWatchLogsFullAccess-policy-attachment
 
 resource "aws_iam_policy_attachment" "AmazonEC2ContainerServiceforEC2Role-policy-attachment" {
 
-  name       = "AmazonEC2ContainerServiceforEC2Role-policy-attachment"
+  name       = "AmazonEC2ContainerServiceforEC2Role-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
   groups     = []
   users      = []
@@ -236,7 +234,7 @@ resource "aws_iam_policy_attachment" "AmazonEC2ContainerServiceforEC2Role-policy
 
 resource "aws_iam_policy_attachment" "AmazonEC2ContainerServiceRole-policy-attachment" {
 
-  name       = "AmazonEC2ContainerServiceRole-policy-attachment"
+  name       = "AmazonEC2ContainerServiceRole-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
   groups     = []
   users      = []
@@ -246,7 +244,7 @@ resource "aws_iam_policy_attachment" "AmazonEC2ContainerServiceRole-policy-attac
 
 resource "aws_iam_policy_attachment" "AmazonEC2ContainerRegistryFullAccess-policy-attachment" {
 
-  name       = "AmazonEC2ContainerRegistryFullAccess-policy-attachment"
+  name       = "AmazonEC2ContainerRegistryFullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
   groups     = []
   users      = []
@@ -256,7 +254,7 @@ resource "aws_iam_policy_attachment" "AmazonEC2ContainerRegistryFullAccess-polic
 
 resource "aws_iam_policy_attachment" "AmazonECS_FullAccess-policy-attachment" {
 
-  name       = "AmazonECS_FullAccess-policy-attachment"
+  name       = "AmazonECS_FullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
   groups     = []
   users      = []
@@ -267,7 +265,7 @@ resource "aws_iam_policy_attachment" "AmazonECS_FullAccess-policy-attachment" {
 
 resource "aws_iam_policy_attachment" "AmazonEC2FullAccess-policy-attachment" {
 
-  name       = "AmazonEC2FullAccess-policy-attachment"
+  name       = "AmazonEC2FullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
   groups     = []
   users      = []
@@ -277,7 +275,7 @@ resource "aws_iam_policy_attachment" "AmazonEC2FullAccess-policy-attachment" {
 
 resource "aws_iam_policy_attachment" "AWSBatchServiceEventTargetRole-policy-attachment" {
 
-  name       = "AWSBatchServiceEventTargetRole-policy-attachment"
+  name       = "AWSBatchServiceEventTargetRole-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceEventTargetRole"
   groups     = []
   users      = []
@@ -287,7 +285,7 @@ resource "aws_iam_policy_attachment" "AWSBatchServiceEventTargetRole-policy-atta
 
 resource "aws_iam_policy_attachment" "AmazonS3FullAccess-policy-attachment" {
 
-  name       = "AmazonS3FullAccess-policy-attachment"
+  name       = "AmazonS3FullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   groups     = []
   users      = []
@@ -297,7 +295,7 @@ resource "aws_iam_policy_attachment" "AmazonS3FullAccess-policy-attachment" {
 
 resource "aws_iam_policy_attachment" "CloudWatchFullAccess-policy-attachment" {
 
-  name       = "CloudWatchFullAccess-policy-attachment"
+  name       = "CloudWatchFullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
   groups     = []
   users      = []
@@ -307,7 +305,7 @@ resource "aws_iam_policy_attachment" "CloudWatchFullAccess-policy-attachment" {
 
 resource "aws_iam_policy_attachment" "AmazonSSMManagedInstanceCore-policy-attachment" {
 
-  name       = "AmazonSSMManagedInstanceCore-policy-attachment"
+  name       = "AmazonSSMManagedInstanceCore-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   groups     = []
   users      = []
@@ -317,7 +315,7 @@ resource "aws_iam_policy_attachment" "AmazonSSMManagedInstanceCore-policy-attach
 
 resource "aws_iam_policy_attachment" "AWSBatchFullAccess-policy-attachment" {
 
-  name       = "AWSBatchFullAccess-policy-attachment"
+  name       = "AWSBatchFullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/AWSBatchFullAccess"
   groups     = []
   users      = []
@@ -327,7 +325,7 @@ resource "aws_iam_policy_attachment" "AWSBatchFullAccess-policy-attachment" {
 
 resource "aws_iam_policy_attachment" "CloudWatchEventsFullAccess-policy-attachment" {
 
-  name       = "CloudWatchEventsFullAccess-policy-attachment"
+  name       = "CloudWatchEventsFullAccess-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
   groups     = []
   users      = []
@@ -337,7 +335,7 @@ resource "aws_iam_policy_attachment" "CloudWatchEventsFullAccess-policy-attachme
 
 resource "aws_iam_policy_attachment" "AmazonEC2SpotFleetTaggingRole-policy-attachment" {
 
-  name       = "AmazonEC2SpotFleetTaggingRole-policy-attachment"
+  name       = "AmazonEC2SpotFleetTaggingRole-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
   groups     = []
   users      = []
@@ -347,7 +345,7 @@ resource "aws_iam_policy_attachment" "AmazonEC2SpotFleetTaggingRole-policy-attac
 
 resource "aws_iam_policy_attachment" "AmazonEC2SpotFleetAutoscaleRole-policy-attachment" {
 
-  name       = "AmazonEC2SpotFleetAutoscaleRole-policy-attachment"
+  name       = "AmazonEC2SpotFleetAutoscaleRole-policy-attachment-${random_string.rand.result}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetAutoscaleRole"
   groups     = []
   users      = []
@@ -356,9 +354,8 @@ resource "aws_iam_policy_attachment" "AmazonEC2SpotFleetAutoscaleRole-policy-att
 }
 
 
+
 // THIS MAY BE NEEDED. Spot service_linked_role
 // resource "aws_iam_service_linked_role" "spot_service_linked_role" {
 //   aws_service_name = "spot.amazonaws.com"
 // }
-
-

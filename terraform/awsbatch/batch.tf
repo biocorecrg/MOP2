@@ -40,7 +40,7 @@ variable "instance_batch" {
 
 variable "instance_batch_gpu" {
   type    = list(string)
-  default = ["p2", "p3", "g3", "g3s"]
+  default = ["p3"]
 }
 
 
@@ -64,6 +64,7 @@ variable "compute_environment_type_gpu" {
   default = "SPOT"
 }
 
+
 variable "subnets" {
   type    = list(string)
   default = ["subnet-8a280df7", "subnet-c54d6588", "subnet-b85ab5d2"]
@@ -79,12 +80,13 @@ variable "queue_name_gpu" {
   default = "spot-gpu"
 }
 
+
 resource "aws_batch_compute_environment" "nf-compute-spot" {
 
-  compute_environment_name = var.compute_environment_name
+  compute_environment_name = format("%s-%s", var.compute_environment_name, random_string.rand.result)
 
   compute_resources {
-    instance_role  = aws_iam_instance_profile.ComputeInstanceProfile.arn
+    instance_role = aws_iam_instance_profile.ComputeInstanceProfile.arn
 
     image_id = var.ami_batch
 
@@ -94,13 +96,13 @@ resource "aws_batch_compute_environment" "nf-compute-spot" {
 
     instance_type = var.instance_batch
 
-    subnets             = var.subnets
+    subnets = var.subnets
 
     type = var.compute_environment_type
 
-    spot_iam_fleet_role = ( var.compute_environment_type == "SPOT" ? aws_iam_role.ClusterFleetRole.arn : null )
+    spot_iam_fleet_role = (var.compute_environment_type == "SPOT" ? aws_iam_role.ClusterFleetRole.arn : null)
 
-    bid_percentage = ( var.compute_environment_type == "SPOT" ? var.bid_percentage : null )
+    bid_percentage = (var.compute_environment_type == "SPOT" ? var.bid_percentage : null)
 
     security_group_ids = [aws_security_group.allow_all.id]
 
@@ -117,10 +119,10 @@ resource "aws_batch_compute_environment" "nf-compute-spot" {
 
 resource "aws_batch_compute_environment" "nf-compute-spot-gpu" {
 
-  compute_environment_name = var.compute_environment_name_gpu
+  compute_environment_name = format("%s-%s", var.compute_environment_name_gpu, random_string.rand.result)
 
   compute_resources {
-    instance_role  = aws_iam_instance_profile.ComputeInstanceProfile.arn
+    instance_role = aws_iam_instance_profile.ComputeInstanceProfile.arn
 
     image_id = var.ami_batch_gpu
 
@@ -130,13 +132,13 @@ resource "aws_batch_compute_environment" "nf-compute-spot-gpu" {
 
     instance_type = var.instance_batch_gpu
 
-    subnets             = var.subnets
+    subnets = var.subnets
 
     type = var.compute_environment_type_gpu
 
-    spot_iam_fleet_role = ( var.compute_environment_type_gpu == "SPOT" ? aws_iam_role.ClusterFleetRole.arn : null )
+    spot_iam_fleet_role = (var.compute_environment_type_gpu == "SPOT" ? aws_iam_role.ClusterFleetRole.arn : null)
 
-    bid_percentage = ( var.compute_environment_type_gpu == "SPOT" ? var.bid_percentage_gpu : null )
+    bid_percentage = (var.compute_environment_type_gpu == "SPOT" ? var.bid_percentage_gpu : null)
 
 
     security_group_ids = [aws_security_group.allow_all.id]
@@ -159,6 +161,8 @@ resource "aws_batch_job_queue" "spot" {
   priority             = 1
   compute_environments = [aws_batch_compute_environment.nf-compute-spot.arn]
 
+  depends_on = [aws_batch_compute_environment.nf-compute-spot]
+
   tags = {
     name = "nf-queue"
   }
@@ -171,7 +175,9 @@ resource "aws_batch_job_queue" "spot-gpu" {
   priority             = 1
   compute_environments = [aws_batch_compute_environment.nf-compute-spot-gpu.arn]
 
+  depends_on = [aws_batch_compute_environment.nf-compute-spot-gpu]
   tags = {
     name = "nf-queue-gpu"
   }
 }
+
