@@ -17,7 +17,7 @@ mkdir -p /home/ec2-user/git
 
 # Git of MoP2
 
-cd /home/ec2-user/git; git clone ${repourl}
+cd /home/ec2-user/git; git clone --recurse-submodules ${repourl}
 
 sudo chown -R ec2-user:ec2-user /home/ec2-user/git
 
