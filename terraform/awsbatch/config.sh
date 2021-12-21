@@ -1,0 +1,26 @@
+export TF_VAR_key_name=key-nf
+export TF_VAR_instance_type=t2.small
+export TF_VAR_ami_entrypoint=ami-0cf1f74891140b374
+export TF_VAR_ami_batch=ami-06b8c6e4fe388181d
+export TF_VAR_ami_batch_gpu=ami-06b8c6e4fe388181d
+export TF_VAR_region=eu-central-1
+export TF_VAR_profile=default
+export TF_VAR_bid_percentage=80
+export TF_VAR_bid_percentage_gpu=100
+export TF_VAR_credentials=/home/myuser/.aws/credentials
+export TF_VAR_ec2_password=testPassw0rd
+export TF_VAR_instance_count=1
+export TF_VAR_instance_volume_size=49
+export TF_VAR_bucket_acl=public-read
+export TF_VAR_compute_environment_name=nf-compute
+export TF_VAR_compute_environment_name_gpu=nf-compute-gpu
+export TF_VAR_compute_environment_type=SPOT
+export TF_VAR_compute_environment_type_gpu=EC2
+export TF_VAR_queue_name=mop
+export TF_VAR_queue_name_gpu=mop-gpu
+export TF_VAR_instance_batch='["optimal"]'
+export TF_VAR_instance_batch_gpu='["p3"]'
+export TF_VAR_repourl=https://github.com/biocorecrg/MoP2
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity|jq .Account|tr -d \")
+# Bucket taking AWS account ID for avoiding clashes
+export TF_VAR_bucket_prefix=my-bucket-${AWS_ACCOUNT_ID}
