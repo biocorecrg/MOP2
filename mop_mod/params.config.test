@@ -5,7 +5,6 @@ params {
     reference           = "$baseDir/../anno/yeast_rRNA_ref.fa.gz"
     
     output             = "$baseDir/output_mod"
-    coverage           = 5
 
     pars_tools         = "$baseDir/tools_opt.tsv"
     
