@@ -31,8 +31,7 @@ comparison                              : ${params.comparison}
 reference                               : ${params.reference}
 output                                  : ${params.output}
 
-coverage                                : ${params.coverage}
-pars_tools								: ${params.pars_tools}
+pars_tools				: ${params.pars_tools}
 
 ************************* Flows *******************************
 epinano                             	: ${params.epinano}
