@@ -1,0 +1,4 @@
+nanocompore v1.0.0rc3-1
+nanopolish version 0.13.3
+Epinano v1.1.1
+Tombo version: 1.5

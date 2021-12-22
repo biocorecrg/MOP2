@@ -1,0 +1,3 @@
+tailfindr [1] ‘0.1.0’
+nanopolish version 0.13.3
+samtools 1.10
