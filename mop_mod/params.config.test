@@ -1,5 +1,5 @@
 params {
-    input_path         = "$baseDir/../mop_preprocess/toy_output/"
+    input_path         = "$baseDir/../mop_preprocess/output/"
     comparison         = "$baseDir/comparison.tsv"
 
     reference           = "$baseDir/../anno/yeast_rRNA_ref.fa.gz"
