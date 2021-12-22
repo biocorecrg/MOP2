@@ -24,10 +24,29 @@ process extracting_demultiplexed_fastq {
 	"""
 }
 
+process preparing_demultiplexing_fast5_deeplexicon {
+
+    label (params.LABEL)
+    tag "${ idfile }"
+		
+	input:
+	tuple val(idfile), path("demux_*")
+
+	output:
+	tuple val(idfile), path("*.list")
+
+	
+	script:
+	"""
+	cat demux_* | grep -v ReadID >> dem.files
+	awk '{print \$2 > \$3".list" }' dem.files
+	"""
+}
+
 process extracting_demultiplexed_fast5_deeplexicon {
     label (params.LABEL)
 	container 'lpryszcz/deeplexicon:1.2.0'
-    tag "${ idfile }"
+    tag "${ idfile } on ${ idlist }"
     if (params.saveSpace == "YES") publishDir(params.OUTPUTF5, mode:'move', pattern: '*-*') 
     else publishDir(params.OUTPUTF5, mode:'copy', pattern: '*-*')    
 
@@ -35,7 +54,7 @@ process extracting_demultiplexed_fast5_deeplexicon {
 
 		
 	input:
-	tuple val(idfile), path("demux_*"), file("*")
+	tuple val(idfile), path(idlist), file("*")
 
 	output:
 	path("${idfile}-*"), type: "dir", emit: dem_fast5
@@ -43,14 +62,10 @@ process extracting_demultiplexed_fast5_deeplexicon {
 	
 	script:
 	"""
-	cat demux_* | grep -v ReadID >> dem.files
-	awk '{print \$2 > \$3".list" }' dem.files
-	for i in *.list; do mkdir ${idfile}---`basename \$i .list`; fast5_subset --input ./ --save_path ${idfile}---`basename \$i .list`/ --read_id_list \$i --batch_size 4000 -c vbz -t ${task.cpus}; done 
-	rm *.list
+	mkdir ${idfile}---`basename ${idlist} .list`; fast5_subset --input ./ --save_path ${idfile}---`basename ${idlist} .list`/ --read_id_list ${idlist} --batch_size 4000 -c vbz -t ${task.cpus}
 	mkdir summaries
 	for i in */filename_mapping.txt; do awk 'BEGIN{print "filename\tread_id"}{print \$2"\t"\$1}' \$i > `echo \$i | awk -F"/" '{print "summaries/"\$1"_final_summary.stats"}'`; done
 	rm */filename_mapping.txt;
-	rm dem.files 
 	"""
 } 
 
@@ -329,7 +344,7 @@ process checkRef {
 process splitReference {
     label (params.LABEL)
     container 'biocorecrg/mopmod:0.6.2'
-    tag "Splitting of ${ reference }"
+    tag "Splitting of ${ reference } in pieces of maximum 20,000,000 bases"
 
     input:
     path(reference)
@@ -447,7 +462,6 @@ process concat_mean_per_pos {
     container 'biocorecrg/mopmod:0.6'
     label (params.LABEL)
     tag "${idsample}" 
-    publishDir(params.OUTPUT, mode:'copy') 
 	
     input:
     tuple val(idsample), path(event_align) 
@@ -492,6 +506,7 @@ process makeEpinanoPlots {
     tag {"${sampleIDA}--${sampleIDB} ${mode}"}  
 	
     input:
+    path(rscript)
     tuple val(sampleIDA), val(sampleIDB), path(per_site_varA), path(per_site_varB) 
     val(mode)
     
@@ -500,7 +515,7 @@ process makeEpinanoPlots {
        
     script:
 	"""
-	Rscript --vanilla ${baseDir}/bin/epinano_scatterplot.R ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
+	Rscript --vanilla ${rscript} ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
 	"""
 }
 
@@ -531,6 +546,7 @@ process multiToSingleFast5 {
 process bedGraphToWig {
     container 'biocorecrg/mopmod:0.6'
     tag "${idsample}"  
+    errorStrategy 'ignore'
 	
     input:
     path(chromsizes)

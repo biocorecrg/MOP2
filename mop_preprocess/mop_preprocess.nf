@@ -81,6 +81,7 @@ logo = file("$baseDir/../img/logo_small.png")
 Channel.fromPath( "$baseDir/deeplexicon/*.h5").set{deepmodels}
 
 
+
 Channel
     .from( config_report, logo )
     .collect().set{multiqc_info}
@@ -119,19 +120,24 @@ if (params.ref_type == "genome") {
 	}
 }
 def demulti_fast5_opt = "OFF"
+
+if (params.demultiplexing == "NO") {
+        demulti_fast5_opt = "OFF"
+}
+
 if (params.demulti_fast5 == "ON" || params.demulti_fast5 == "YES" ) {
 	demulti_fast5_opt = "ON"
 }
 
 def guppy_basecall_label = (params.GPU == 'ON' ? 'basecall_gpus' : 'big_cpus')
-def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : 'big_cpus')
+def deeplexi_basecall_label = (params.GPU == 'ON' ? 'demulti_gpus' : '')
 def output_bc = (demulti_fast5_opt == 'ON' ? '' : outputFast5)
 def outputMinionQC = (demulti_fast5_opt == 'ON' ? '': outputQual)
 
 if (params.saveSpace == "YES") outmode = "move"
 else outmode = "copy"
 
-include { RNA2DNA; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
+include { RNA2DNA; preparing_demultiplexing_fast5_deeplexicon; extracting_demultiplexed_fastq; parseFinalSummary; checkTools; reshapeSamples; reshapeDemuxSamples; checkRef; getParameters } from "${local_modules}" 
 include { extracting_demultiplexed_fast5_deeplexicon } from "${local_modules}" addParams(OUTPUTF5: outputFast5, OUTPUTST: outputQual, LABEL: 'big_cpus')
 include { extracting_demultiplexed_fast5_guppy } from "${local_modules}" addParams(OUTPUT: outputFast5, LABEL: 'big_cpus')
 
@@ -222,15 +228,20 @@ workflow flow2 {
 		// IF DEMULTIPLEXING IS DEEPLEXICON	
     	if(params.demultiplexing == "deeplexicon") {
 			outbc = GUPPY_BASECALL(fast5_4_analysis)
-			demux = DEMULTIPLEX_DEEPLEXICON(deepmodels, fast5_4_analysis)
+
+            demux = DEMULTIPLEX_DEEPLEXICON(deepmodels, fast5_4_analysis)
 			fast5_res = outbc.basecalled_fast5
 		
 			// Optional demultiplex fast5 		
 			if (demulti_fast5_opt == "ON") {
 				basecalledbc = reshapeSamples(outbc.basecalled_fast5)
 				alldemux = reshapeSamples(demux)				
-				data_for_demux = alldemux.groupTuple().join(basecalledbc.transpose().groupTuple())
-				out_demux = extracting_demultiplexed_fast5_deeplexicon(data_for_demux)
+				
+				//data_for_demux = alldemux.groupTuple().join(basecalledbc.transpose().groupTuple())
+				prep_demux = preparing_demultiplexing_fast5_deeplexicon(alldemux.groupTuple()).transpose()
+				data_for_demux = prep_demux.combine(basecalledbc.transpose().groupTuple(),  by: 0)
+				
+				extracting_demultiplexed_fast5_deeplexicon(data_for_demux)
 				
 				// OPTIONAL CLEANING FASTQ5 FILES
 				if (params.saveSpace == "YES") {

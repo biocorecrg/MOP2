@@ -3,7 +3,7 @@ params {
     fast5               = "$baseDir/../data/**/*.fast5"
     fastq               = ""
 
-    reference           = "$baseDir/../anno/curlcake_constructs.fasta.gz"
+    reference           = "$baseDir/../anno/yeast_rRNA_ref.fa.gz"
     annotation          = ""
     ref_type            = "transcriptome"
 
@@ -14,8 +14,8 @@ params {
 
     basecalling         = "guppy"
     GPU                 = "OFF"
-    demultiplexing      = "deeplexicon"
-    demulti_fast5       = "YES" 
+    demultiplexing      = "NO"
+    demulti_fast5       = "NO" 
 
     filtering           = "nanoq"
 
