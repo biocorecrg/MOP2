@@ -38,6 +38,10 @@ jobs:
           bash INSTALL.sh
           cd mop_preprocess 
           ../../nextflow run mop_preprocess.nf -with-docker -profile local
+          cd ../mop_mod
+          ../../nextflow run mop_mod.nf -with-docker -profile local
+          cd ../mop_tail
+           ../../nextflow run mop_tail.nf -with-docker -profile local
 
         env:
           NXF_ANSI_LOG: false
