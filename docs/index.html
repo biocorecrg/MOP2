@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to the documentation of Master Of Pores &mdash; Master of Pores 2  documentation</title>
+  <title>Welcome to the documentation of Master Of Pores 2 &mdash; Master of Pores 2  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -59,7 +59,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Welcome to the documentation of Master Of Pores</li>
+      <li>Welcome to the documentation of Master Of Pores 2</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -68,15 +68,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-the-documentation-of-master-of-pores">
-<span id="home-page-index"></span><h1>Welcome to the documentation of Master Of Pores<a class="headerlink" href="#welcome-to-the-documentation-of-master-of-pores" title="Permalink to this headline"></a></h1>
+  <section id="welcome-to-the-documentation-of-master-of-pores-2">
+<span id="home-page-index"></span><h1>Welcome to the documentation of Master Of Pores 2<a class="headerlink" href="#welcome-to-the-documentation-of-master-of-pores-2" title="Permalink to this headline"></a></h1>
 <a class="reference internal image-reference" href="../_images/master_red.jpg"><img alt="../_images/master_red.jpg" src="../_images/master_red.jpg" style="width: 400px;" /></a>
 <p>Master of Pores is a pipeline written in Nextflow DSL2 for the analysis of Nanopore data. It can handle reads from direct RNAseq, cDNAseq, DNAseq etc.</p>
 <dl class="simple">
 <dt>The pipeline is composed by theee modules:</dt><dd><ul class="simple">
 <li><p>mop_preprocess: preprocessing</p></li>
-<li><p>mop_mod: detecting chemical modifications. It reads the output directly from mop_preprocess. [NOT YET FULLY TRANSLATED TO DSL2]</p></li>
+<li><p>mop_mod: detecting chemical modifications. It reads the output directly from mop_preprocess.</p></li>
 <li><p>mop_tail: estimating polyA tail size. It reads the output directly from mop_preprocess</p></li>
+<li><p>mop_consensus: it generates a consensus from the predictions from mop_mod. It reads the output directly from mop_mod</p></li>
 </ul>
 </dd>
 </dl>
