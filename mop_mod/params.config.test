@@ -11,7 +11,7 @@ params {
     
     // flows 
     epinano       = "YES"
-    nanocompore   = "YES"
+    nanocompore   = "NO"
     tombo_lsc     = "YES"
     tombo_msc     = "YES"
 
