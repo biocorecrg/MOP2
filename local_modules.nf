@@ -507,6 +507,7 @@ process makeEpinanoPlots {
     tag {"${sampleIDA}--${sampleIDB} ${mode}"}  
 	
     input:
+    path(rscript)
     tuple val(sampleIDA), val(sampleIDB), path(per_site_varA), path(per_site_varB) 
     val(mode)
     
@@ -515,7 +516,7 @@ process makeEpinanoPlots {
        
     script:
 	"""
-	Rscript --vanilla ${baseDir}/bin/epinano_scatterplot.R ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
+	Rscript --vanilla ${rscript} ${per_site_varA} ${sampleIDA} ${per_site_varB} ${sampleIDB} ${mode}  
 	"""
 }
 
