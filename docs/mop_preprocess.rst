@@ -56,7 +56,7 @@ Input Parameters
    * - **discovery**
      -  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
    * - **cram_conv**
-     -  Converting bam in cram. **[YES / ""]**
+     -  Converting bam in cram. **[YES / NO]**
    * - **subsampling_cram**
      -  Subsampling BAM before CRAM conversion. **[YES / NO]**
    * - **saveSpace**
