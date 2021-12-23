@@ -2,65 +2,34 @@
 Benchmark
 *******************
 
-We tested MoP on different datasets at the CRG's HPC where we can run up to 100 jobs in parallel (maximum 8 CPUs each) and using up to 10 GPU cards (GeForce RTX 2080 Ti).
+We tested MoP on two minION runs using the CRG's HPC where we can run up to 100 jobs in parallel (maximum 8 CPUs each) and using up to 10 GPU cards (GeForce RTX 2080 Ti). The test dataset was published at `ENA <https://www.ebi.ac.uk/>`_ with the accession `ERR5296640 <https://www.ebi.ac.uk/ena/browser/view/ERR5296640>`__  for pU samples and `ERR5303454 <https://www.ebi.ac.uk/ena/browser/view/ERR5303454>`__ for Nm samples.
+ 
 
-MOP_PREPROCESS
------------------
-
-.. list-table:: Dataset
-   
- * - 
-   - Toy sample
-   - Flongle
-   - MinION
-   - gridION
-   - PromethION
- * - Fast5 files
-   - 10 
-   - 20 
-   - 100 
-   - 500 
-   - 2,916 
- * - Reads
-   - 8,000
-   - 16,000
-   - 400,000 
-   - 2,000,000
-   - 11,600,000
- * - Execution time
-   - 10m
-   - 18m
-   - 1h 4m
-   - 4h 19m
-   - x
-
-MOP_MOD
------------------
 
 .. list-table:: Dataset
 
  * - 
-   - Toy sample
-   - Flongle
-   - MinION
-   - gridION
-   - PromethION
- * - Fast5 files
-   - 10 
-   - 20 
-   - 100 
-   - 500 
-   - 2,916 
- * - Reads
-   - 8,000
-   - 16,000
-   - 400,000 
-   - 2,000,000
-   - 11,600,000
+   - MOP_PREPROCESS
+   - MOP_MOD
+   - MOP_TAIL
+   - MOP_CONSENSUS
+ * - Input data
+   - 95 Gb 
+   - 137 Gb 
+   - 137 Gb 
+   - 14 Mb
  * - Execution time
-   - 45m
-   - x
-   - x
-   - x
-   - x
-
+   - 5 hours
+   - 7 hours
+   - 4 hours 
+   - xx hours
+ * - Work folder
+   - 382 Gb
+   - 595 Gb
+   - 3 Gb
+   - xx
+ * - Output folder
+   - 137 Gb
+   - 14 Mb
+   - 76 Mb
+   - xx
