@@ -52,15 +52,15 @@ Input Parameters
    * - **mapping**
      -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]** 
    * - **counting**
-     -  Tool for gene or transcripts counts **[htseq / nanocount / NO""]**
+     -  Tool for gene or transcripts counts **[htseq / nanocount / NO]**
    * - **discovery**
      -  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
    * - **cram_conv**
      -  Converting bam in cram. **[YES / ""]**
    * - **subsampling_cram**
-     -  Subsampling BAM before CRAM conversion. **[YES / ""]**
+     -  Subsampling BAM before CRAM conversion. **[YES / NO]**
    * - **saveSpace**
-     -  Remove intermediate files (**beta**) **[YES / ""]**
+     -  Remove intermediate files (**beta**) **[YES / NO]**
    * - **email**
      -  Users email for receving the final report when the pipeline is finished. **[user_email]**
 
