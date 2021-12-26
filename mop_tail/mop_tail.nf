@@ -62,7 +62,7 @@ include { getParameters; checkRef } from "${local_modules}"
 
 progPars = getParameters(params.pars_tools)
 
-include { ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL } from "${subworkflowsDir}/chem_modification/tailfindr" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tailfindr--tailfindr"])
+include { ESTIMATE_TAIL as TAILFINDR_ESTIMATE_TAIL } from "${subworkflowsDir}/chem_modification/tailfindr" addParams(LABEL: 'big_cpus_retry', EXTRAPARS: progPars["tailfindr--tailfindr"])
 include { GET_VERSION as TAILFINDR_VER } from "${subworkflowsDir}/chem_modification/tailfindr" 
 include { GET_VERSION as SAMTOOLS_VER; INDEX as SAMTOOLS_INDEX } from "${subworkflowsDir}/misc/samtools"
 include { POLYA_LEN as NANOPOLISH_POLYA_LEN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_cpus',  OUTPUT: outputNanopolish, EXTRAPARS: progPars["nanopolish--nanopolish"])
