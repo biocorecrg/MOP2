@@ -19,10 +19,10 @@ We tested MoP on two minION runs using the CRG's HPC where we can run up to 100 
    - 137 Gb 
    - 14 Mb
  * - Execution time
-   - 5 hours
-   - 7 hours
+   - 10 hours
+   - 6 hours
    - 4 hours 
-   - 10 mins
+   - 3 mins
  * - Work folder
    - 382 Gb
    - 595 Gb
