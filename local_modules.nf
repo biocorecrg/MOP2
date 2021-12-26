@@ -547,6 +547,7 @@ process multiToSingleFast5 {
 process bedGraphToWig {
     container 'biocorecrg/mopmod:0.6'
     tag "${idsample}"  
+    errorStrategy 'ignore'
 	
     input:
     path(chromsizes)
