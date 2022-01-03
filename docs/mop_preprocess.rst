@@ -54,7 +54,7 @@ Input Parameters
    * - **counting**
      -  Tool for gene or transcripts counts **[htseq / nanocount / NO]**
    * - **discovery**
-     -  Tool for generating novel transcripts. **[bambu / isoquant / NO]** 
+     -  Tool for generating novel transcripts. **[bambu / NO]** 
    * - **cram_conv**
      -  Converting bam in cram. **[YES / NO]**
    * - **subsampling_cram**
