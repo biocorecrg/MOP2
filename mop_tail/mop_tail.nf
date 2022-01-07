@@ -94,9 +94,10 @@ fast5_files_4_np.map{
 workflow {	
 
 	if (params.tailfindr == "YES") {
-		tail_estim = TAILFINDR_ESTIMATE_TAIL(fast5_files_4_tf)
-		resh_tail_estim = reshapeSamples(tail_estim)
-		tailres = collect_tailfindr_results(resh_tail_estim.groupTuple())
+		tail_estim = TAILFINDR_ESTIMATE_TAIL(fast5_files_4_np)
+		//resh_tail_estim = reshapeSamples(tail_estim)
+		//tail_estim.groupTuple().view()
+		tailres = collect_tailfindr_results(tail_estim.groupTuple())
 	}
 	if (params.nanopolish == "YES") {
 		ref_file = checkRef(reference)
@@ -105,7 +106,9 @@ workflow {
 		nanores = NANOPOLISH_POLYA_LEN(fast5_files_4_np, bams, bais, fastqs, ref_file) 
 	}
 	if (params.tailfindr == "YES" && params.nanopolish == "YES") {
-		join_nanotail_results(tailres.length.join(nanores.filtered_est).join(assigned), joinScript)
+                log.info "Joining results"
+				//nanores.filtered_est.view()
+                join_nanotail_results(tailres.length.join(nanores.filtered_est).join(assigned), joinScript)
 
 	}
 
