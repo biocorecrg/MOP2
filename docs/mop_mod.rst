@@ -96,7 +96,7 @@ Several folders are created by the pipeline within the output directory specifie
    
 Here an example of a plot from Epinano:
 
-.. image:: ../img/epinano.jpg
+.. image:: ../img/epinano.png
   :width: 600  
  
 
