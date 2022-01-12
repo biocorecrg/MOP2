@@ -161,7 +161,7 @@ Several folders are created by the pipeline within the output directory specifie
 Here an example of a final report:
 
 .. image:: ../img/multiqc.png
-  :width: 600  
+  :width: 800  
 
 
 
