@@ -87,3 +87,10 @@ Several folders are created by the pipeline within the output directory specifie
    "020cde28-970d-4710-90a5-977e4b4bbc46"	41.27	56.79	"YGL238W" 
 
 If both softwares are run, an additional plot which shows the correlation of their results is generated. 
+
+
+Here an example of a result:
+
+.. image:: ../img/moptail.png
+  :width: 800  
+

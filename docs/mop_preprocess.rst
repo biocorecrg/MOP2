@@ -158,7 +158,10 @@ Several folders are created by the pipeline within the output directory specifie
 * **assembly**: It contains assembled transcripts.
 
 
+Here an example of a final report:
 
+.. image:: ../img/multiqc.png
+  :width: 800  
 
 
 
