@@ -80,7 +80,7 @@ include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem
 include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputTomboFlow)
 include { GET_MODIFICATION_LSC as TOMBO_GET_MODIFICATION_LSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_lsc--tombo"], OUTPUT: outputTomboFlow)
 
-include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano" 
+include { GET_VERSION as EPINANO_VER } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" 
 include { GET_VERSION as NANOPOLISH_VER } from "${subworkflowsDir}/chem_modification/nanopolish" 
 include { GET_VERSION as NANOCOMPORE_VER } from "${subworkflowsDir}/chem_modification/nanocompore" 
 include { GET_VERSION as TOMBO_VER } from "${subworkflowsDir}/chem_modification/tombo.nf"
