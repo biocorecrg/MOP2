@@ -62,7 +62,7 @@ Finally we can then launch the pipeline adding the parameter `-with-tower`.
 
 Going back to the website you can see now your pipeline running and have a nice looking live reporting.
 
-.. image:: img/tower.gif
+.. image:: ../img/tower.gif
   :width: 800
 
 
