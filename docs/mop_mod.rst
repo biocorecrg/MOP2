@@ -13,7 +13,7 @@ This module takes as input the output from MOP_PREPROCESS: basecalled fast5 read
 Input Parameters
 ======================
 
-.. list-table:: Title
+.. list-table:: 
    :widths: 25 75
    :header-rows: 1
 
