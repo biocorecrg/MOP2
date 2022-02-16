@@ -77,8 +77,12 @@
              
   <section id="how-to-install">
 <span id="home-page-install"></span><h1>How to install<a class="headerlink" href="#how-to-install" title="Permalink to this headline"></a></h1>
-<p>Please install nextflow <a class="reference external" href="https://www.nextflow.io/">Nextflow</a> and <a class="reference external" href="https://sylabs.io/">Singularity</a> or <a class="reference external" href="https://www.docker.com/">Docker</a> before.</p>
-<p>Then download the repo:</p>
+<p>Please install nextflow <a class="reference external" href="https://www.nextflow.io/">Nextflow</a> and either <a class="reference external" href="https://sylabs.io/">Singularity</a> or <a class="reference external" href="https://www.docker.com/">Docker</a> before.</p>
+<p>For installing Nextflow you need a POSIX compatible system (Linux, OS X, etc). It requires Bash 3.2 (or later) and Java 8 (or later, up to 17). Windows system is supported through WSL. For the installation of Nextflow just run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">curl -s https://get.nextflow.io | bash</span>
+</pre></div>
+</div>
+<p>For installing the pipeline you need to download the repo:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone --depth 1 --recurse-submodules https://github.com/biocorecrg/MOP2.git</span>
 </pre></div>
 </div>
