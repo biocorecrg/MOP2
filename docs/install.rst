@@ -7,9 +7,15 @@ How to install
 .. autosummary::
    :toctree: generated
 
-Please install nextflow `Nextflow <https://www.nextflow.io/>`_ and `Singularity <https://sylabs.io/>`_ or `Docker <https://www.docker.com/>`_ before.
+Please install nextflow `Nextflow <https://www.nextflow.io/>`_ and either `Singularity <https://sylabs.io/>`_ or `Docker <https://www.docker.com/>`_ before.
 
-Then download the repo:
+For installing Nextflow you need a POSIX compatible system (Linux, OS X, etc). It requires Bash 3.2 (or later) and Java 8 (or later, up to 17). Windows system is supported through WSL. For the installation of Nextflow just run:
+
+.. code-block:: console
+
+  curl -s https://get.nextflow.io | bash
+
+For installing the pipeline you need to download the repo:
 
 .. code-block:: console
 
