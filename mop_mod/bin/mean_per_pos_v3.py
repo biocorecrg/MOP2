@@ -49,11 +49,15 @@ def mean_perpos (raw_data_polars, output_prefix):
      .groupby( ["contig", "position", "reference_kmer"])
      .agg([
          (pl.col("event_level_mean").mean().alias("mean")), 
-         (pl.col("read_name").n_unique().alias("coverage") )])
+         (pl.col("read_name").n_unique().alias("coverage") )
+         ])
      .sort(["contig", "position","reference_kmer" ])
      )
     
-    q.collect().to_parquet(output_fn, compression='zstd')
+    result_df = q.collect()
+    result_df["read_name"] = pd.Series([1 for x in range(result_df.height)])
+    result_df = result_df["contig", "position", "reference_kmer","read_name","mean", "coverage"]
+    result_df.to_parquet(output_fn)
 
     #Output parquet file:
     print(f"Saving results to: {output_fn}")
@@ -74,7 +78,11 @@ def median_perpos (raw_data_polars, output_prefix):
      .sort(["contig", "position","reference_kmer" ])
     )
     
-    q.collect().to_parquet(output_fn, compression='zstd')
+    result_df = q.collect()
+    result_df["read_name"] = pd.Series([1 for x in range(result_df.height)])
+    result_df = result_df["contig", "position", "reference_kmer","read_name","median", "coverage"]
+    result_df.to_parquet(output_fn)
+    #q.collect().to_parquet(output_fn, compression='zstd')
     
     #Output .csv files:
     print(f"Saving median_perpos results to: {output_fn}")
