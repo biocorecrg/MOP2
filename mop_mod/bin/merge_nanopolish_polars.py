@@ -13,8 +13,9 @@ import pyarrow.parquet as pq
 import polars as pl
 
 
-def process_contig_group(input_parquet_files, out_dir, num_threads):
-
+def process_contigs(input_parquet_files, out_dir, num_threads):
+    "no contigs groups as input yet"
+     
     # tmp dir to output partitioned by contig prquets
     datasets_dir = "out_datasets_merger"
     os.system(f"mkdir {out_dir}")
