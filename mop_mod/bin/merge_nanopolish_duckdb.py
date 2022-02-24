@@ -18,18 +18,22 @@ def concat_csv_gz(list_of_files, output_fn):
 def process_contig_group(
     parquet_inputs_fn_list, num_threads, countig_groups_fn, group_id
 ):
-    def parse_contig_groups(tsv_fn, group_id):
+    def parse_contig_groups(tsv_fn):
         my_group_contigs = []
         with open(tsv_fn) as f:
             for line in f:
                 line = line.strip()
-                contig, group_name = line.split()
-                if group_name == group_id:
-                    my_group_contigs.append(contig)
+                sl = line.split()
+                contig = sl[0] 
+                my_group_contigs.append(contig)
 
         assert len(my_group_contigs) > 0
         return my_group_contigs
 
+    contig_list = parse_contig_groups(countig_groups_fn)
+    contig_list_sqlish = ", ".join(f"'{w}'" for w in contig_list)
+    
+    print(contig_list_sqlish)
     # set up DuckDB
     duckdb_pragma_1 = "PRAGMA enable_object_cache"
     duckdb_pragma_2 = f"PRAGMA threads={num_threads}"
@@ -42,9 +46,9 @@ def process_contig_group(
     # group_parquet_glob = f"*_dset/contig_group={group_id}/*parquet"
     # print(group_parquet_glob)
 
-    sql_option_1 = f"CREATE VIEW contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list})"
+    #sql_option_1 = f"CREATE VIEW contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list})"
 
-    sql_option_2 = f"CREATE TABLE contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list})"
+    sql_option_2 = f"CREATE TABLE contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list}) WHERE contig IN ({contig_list_sqlish}) ORDER BY contig, position, reference_kmer"
 
     if debug_me == True:
         print(option_1)
@@ -52,17 +56,19 @@ def process_contig_group(
     con.execute(f"{sql_option_2}")
 
     # optional, needs to be benchmarked
+    #sql_sort = ""
+
     sql_index = (
         "CREATE INDEX con_pos_kmer ON contig_grp (contig, position, reference_kmer)"
     )
     con.execute(f"{sql_index}")
 
-    contig_list = parse_contig_groups(countig_groups_fn, group_id)
+    
 
     csv_gz_fn_list = []
 
     for contig_id in contig_list:
-        out_csv_fn = f"{group_id}_{contig_id}_merged.csv"
+        out_csv_fn = f"{contig_id}_merged.csv"
         contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median), sum(coverage)  \
             FROM contig_grp \
             WHERE contig='{contig_id}' \
