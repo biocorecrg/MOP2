@@ -2,7 +2,16 @@
 
 desc = "Concatenate file(s) containing median current intensity values per position values."
 
-# Import required libraries:
+"""
+# example command:
+
+./merge_nanopolish_duckdb.py -t 8 -i mod_batch_0.perpos_median_dset/contig_group=g1/*.parquet -o result.gz -l contig_groups.tsv -g g1
+
+"""
+
+
+# Import the required libraries:
+
 import argparse
 import os
 
@@ -24,7 +33,7 @@ def process_contig_group(
             for line in f:
                 line = line.strip()
                 sl = line.split()
-                contig = sl[0] 
+                contig = sl[0]
                 my_group_contigs.append(contig)
 
         assert len(my_group_contigs) > 0
@@ -32,8 +41,8 @@ def process_contig_group(
 
     contig_list = parse_contig_groups(countig_groups_fn)
     contig_list_sqlish = ", ".join(f"'{w}'" for w in contig_list)
-    
-    print(contig_list_sqlish)
+
+    # print(contig_list_sqlish)
     # set up DuckDB
     duckdb_pragma_1 = "PRAGMA enable_object_cache"
     duckdb_pragma_2 = f"PRAGMA threads={num_threads}"
@@ -46,7 +55,7 @@ def process_contig_group(
     # group_parquet_glob = f"*_dset/contig_group={group_id}/*parquet"
     # print(group_parquet_glob)
 
-    #sql_option_1 = f"CREATE VIEW contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list})"
+    # sql_option_1 = f"CREATE VIEW contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list})"
 
     sql_option_2 = f"CREATE TABLE contig_grp AS SELECT * FROM parquet_scan({parquet_inputs_fn_list}) WHERE contig IN ({contig_list_sqlish}) ORDER BY contig, position, reference_kmer"
 
@@ -56,20 +65,19 @@ def process_contig_group(
     con.execute(f"{sql_option_2}")
 
     # optional, needs to be benchmarked
-    #sql_sort = ""
+    # sql_sort = ""
 
     sql_index = (
         "CREATE INDEX con_pos_kmer ON contig_grp (contig, position, reference_kmer)"
     )
     con.execute(f"{sql_index}")
 
-    
-
     csv_gz_fn_list = []
 
     for contig_id in contig_list:
         out_csv_fn = f"{contig_id}_merged.csv"
-        contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median), sum(coverage)  \
+        print(out_csv_fn)
+        contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median) AS 'median', sum(coverage) AS 'coverage' \
             FROM contig_grp \
             WHERE contig='{contig_id}' \
             GROUP BY contig, position, reference_kmer) TO '{out_csv_fn}' WITH (HEADER 1, DELIMITER ',')"
@@ -78,8 +86,12 @@ def process_contig_group(
         command_pigz = f"pigz -p{num_threads} {out_csv_fn}"
 
         os.system(f"{command_pigz}")
-        csv_gz_fn_list.append(out_csv_fn)
-    return csv_gz_fn_list.sort()
+        csv_gz_fn_list.append(f"{out_csv_fn}.gz")
+        print(csv_gz_fn_list)
+
+    # print("debug 2", csv_gz_fn_list )
+
+    return csv_gz_fn_list
 
 
 def main():
@@ -96,13 +108,14 @@ def main():
     parser.add_argument("-g", "--group_id", help="contig_group id to process")
 
     a = parser.parse_args()
-
+    # print(a)
     # Read, parse and merge data from individual eventalign files:
     csv_files_4_concat = process_contig_group(
         a.input, a.threads, a.countig_groups, a.group_id
     )
-    #concat_csv_gz(csv_files_4_concat, a.output)
-    
+    # print("debug 1", csv_files_4_concat)
+    concat_csv_gz(csv_files_4_concat, a.output)
+
 
 if __name__ == "__main__":
     debug_me = False
