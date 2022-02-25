@@ -76,14 +76,27 @@ def process_contig_group(
     con.execute(f"{sql_index}")
 
     csv_gz_fn_list = []
-
+    
+    first_contig = True
     for contig_id in contig_list:
         out_csv_fn = f"remove-me_{contig_id}_merged.csv"
         print(out_csv_fn)
-        contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median) AS 'median', sum(coverage) AS 'coverage' \
-            FROM contig_grp \
-            WHERE contig='{contig_id}' \
-            GROUP BY contig, position, reference_kmer) TO '{out_csv_fn}' WITH (HEADER 1, DELIMITER ',')"
+        
+        if first_contig == True:
+            contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median) AS 'median', sum(coverage) AS 'coverage' \
+                FROM contig_grp \
+                WHERE contig='{contig_id}' \
+                GROUP BY contig, position, reference_kmer) TO '{out_csv_fn}' WITH (HEADER 1, DELIMITER ',')"
+            
+            first_contig = False
+        else:
+            contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median) AS 'median', sum(coverage) AS 'coverage' \
+                FROM contig_grp \
+                WHERE contig='{contig_id}' \
+                GROUP BY contig, position, reference_kmer) TO '{out_csv_fn}' WITH (HEADER 0, DELIMITER ',')"
+
+
+            
         print(contig_select_sql)
         con.execute(f"{contig_select_sql}")
         command_pigz = f"pigz -p{num_threads} {out_csv_fn}"
