@@ -20,8 +20,11 @@ import duckdb
 
 def concat_csv_gz(list_of_files, output_fn):
     file_names = " ".join(list_of_files)
-    command = f"cat {file_names} > {output_fn}"
-    os.system(command)
+    cat_command = f"cat {file_names} > {output_fn}"
+    os.system(cat_command)
+    #remove the intermediates
+    purge_command = f"rm  {file_names}"
+    os.system(purge_command)
 
 
 def process_contig_group(
@@ -75,7 +78,7 @@ def process_contig_group(
     csv_gz_fn_list = []
 
     for contig_id in contig_list:
-        out_csv_fn = f"{contig_id}_merged.csv"
+        out_csv_fn = f"remove-me_{contig_id}_merged.csv"
         print(out_csv_fn)
         contig_select_sql = f"COPY (SELECT contig, position, reference_kmer, median(median) AS 'median', sum(coverage) AS 'coverage' \
             FROM contig_grp \
