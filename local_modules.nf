@@ -354,7 +354,7 @@ process splitReference {
 
     script:
     """
-    faSplit about ${reference} 20000000 pieces
+    faSplit about ${reference} 100000 pieces
     """
 }
 
@@ -435,7 +435,7 @@ process joinEpinanoRes {
 
 process mean_per_pos {
 
-    container 'biocorecrg/mopmod:0.6'
+    container 'biocorecrg/mopmod:0.7'
     label (params.LABEL)
     tag "${idsample}" 
 	
@@ -443,13 +443,13 @@ process mean_per_pos {
     tuple val(idsample), path(event_align) 
     
     output:
-    tuple val(idsample), path("*_perpos_median.parquete")
+    tuple val(idsample), path("*_perpos_median.parquet")
 
 
     script:
     
     """
-	mean_per_pos.py -i ${event_align} -o `basename ${event_align} .fast5_event_align.tsv.gz` -s 500000
+	mean_per_pos.py -i ${event_align} -o `basename ${event_align} .fast5_event_align.tsv.gz`
 	#gzip *_processed_perpos_median.tsv
     """
 }
@@ -459,24 +459,47 @@ process mean_per_pos {
 */
 process concat_mean_per_pos {
 
-    container 'biocorecrg/mopmod:0.6'
+    container 'biocorecrg/mopmod:0.7'
     label (params.LABEL)
-    tag "${idsample}" 
-    publishDir(params.OUTPUT, mode:'copy') 
-	
+    tag "${idsample} on ${chr_file}" 
+    	
     input:
-    tuple val(idsample), path(event_align) 
+    tuple val(idsample), path(event_align), path(chr_file)
     
     output:
-    tuple val(idsample), path("*")
+    tuple val(idsample), path("${idsample}.gz")
 
 
     script:
     """
-	Merging_processed_nanopolish_data.py -i *.parquete -o ${idsample}
+	Merging_processed_nanopolish_data.py -i *.parquet -o ${idsample}.gz -t ${task.cpus} -l ${chr_file}
     """
 }
 
+
+/*
+* CONCAT CSV FILES 
+*/
+process concat_csv_files {
+
+    container 'biocorecrg/mopmod:0.7'
+    label (params.LABEL)
+    tag "${idsample}" 
+    
+    publishDir(params.OUTPUT, mode:'copy') 
+	
+    input:
+    tuple val(idsample), path("files_*")
+    
+    output:
+    tuple val(idsample), path("${idsample}.csv.gz")
+
+
+    script:
+    """
+	zcat files_* | awk '!(NR>1 && /reference_kmer/)'| pigz -p ${task.cpus} >> ${idsample}.csv.gz
+    """
+}
 
 /*
 *

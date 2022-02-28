@@ -74,7 +74,7 @@ progPars = getParameters(params.pars_tools)
 
 include { calcVarFrequencies as EPINANO_CALC_VAR_FREQUENCIES } from "${subworkflowsDir}/chem_modification/epinano_1.2.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["epinano--epinano"])
 include { joinEpinanoRes }  from "${local_modules}" addParams(OUTPUT: outputEpinanoFlow)
-include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_time_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
+include { EVENTALIGN as NANOPOLISH_EVENTALIGN } from "${subworkflowsDir}/chem_modification/nanopolish" addParams(LABEL: 'big_mem_cpus', LABELBIG: 'big_time_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanopolish"])
 include { SAMPLE_COMPARE as NANOCOMPORE_SAMPLE_COMPARE } from "${subworkflowsDir}/chem_modification/nanocompore" addParams(LABEL: 'big_time_cpus',  OUTPUT: outputNanoPolComFlow, EXTRAPARS: progPars["nanocompore--nanocompore"])
 include { RESQUIGGLE_RNA as TOMBO_RESQUIGGLE_RNA } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_cpus', EXTRAPARS: progPars["tombo_resquiggling--tombo"])
 include { GET_MODIFICATION_MSC as TOMBO_GET_MODIFICATION_MSC } from "${subworkflowsDir}/chem_modification/tombo.nf" addParams(LABEL: 'big_mem_cpus', EXTRAPARS: progPars["tombo_msc--tombo"], OUTPUT: outputTomboFlow)
@@ -92,8 +92,8 @@ include { makeEpinanoPlots as makeEpinanoPlots_mis; makeEpinanoPlots as makeEpin
 include { multiToSingleFast5 } addParams(LABEL: 'big_cpus') from "${local_modules}"
 include { mean_per_pos } addParams(LABEL: 'big_mem_cpus') from "${local_modules}"
 
-include { concat_mean_per_pos } addParams(OUTPUT: outputNanoPolComFlow, LABEL: 'big_mem') from "${local_modules}" 
-
+include { concat_mean_per_pos } addParams(LABEL: 'big_mem_cpus') from "${local_modules}" 
+include { concat_csv_files } addParams(OUTPUT: outputNanoPolComFlow, LABEL: 'big_mem_cpus') from "${local_modules}" 
 
 
 /*
@@ -268,11 +268,15 @@ workflow compore_polish_flow {
 		ref_file		
 	
 	main:	
+		chromSizes = getChromInfo(ref_file)
+		chromSizes.splitText(file: true, by: 500).set{chromFiles}
 		outnp = NANOPOLISH_EVENTALIGN(fast5_folders, bams, bais, fastqs, summaries, ref_file)
 		mean_pps = mean_per_pos(outnp.aligned_events)
-		concat_mean = concat_mean_per_pos(mean_pps.groupTuple())
-		combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
-		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
+		concat_chunks = concat_mean_per_pos(mean_pps.groupTuple().combine(chromFiles))
+		concat_csv_files(concat_chunks.groupTuple())
+		
+		//combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
+		//NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
 	
 }
 
