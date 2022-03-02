@@ -3,14 +3,16 @@ desc= "Concatenate file(s) containing median current intensity values per positi
 
 # Import required libraries:
 import argparse
-import statistics
 import os
+import statistics
+
 import pandas as pd
 import pyarrow as pa
-import pyarrow.parquet as pq
 import pyarrow.compute as pc
 import pyarrow.dataset as ds
+import pyarrow.parquet as pq
 from pyarrow import fs
+
 
 def generate_output(output_file, data, initial):
     #Create output file:

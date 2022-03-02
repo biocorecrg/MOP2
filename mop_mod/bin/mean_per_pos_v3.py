@@ -17,14 +17,11 @@ desc= "Calculate mean current analysis per position from nanopolish event align 
 
 import argparse
 
-
 import pandas as pd
+import polars as pl
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-
-
-import polars as pl
 
 def parse_input(input_fn):
     

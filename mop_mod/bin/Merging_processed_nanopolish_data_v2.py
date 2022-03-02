@@ -5,10 +5,12 @@ desc= "Concatenate file(s) containing median current intensity values per positi
 import argparse
 import csv
 import statistics
+
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from pyarrow import csv
+
 
 def process_dicts(files):
     intensity = dict()
