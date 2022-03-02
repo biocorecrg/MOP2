@@ -2,12 +2,13 @@
 __author__ = 'luca.cozzuto@crg.eu'
 # -*- coding utf-8 -*-
 
+import gzip
+import optparse
+import os
+import re
 #MODULES
 import sys
-import re
-import optparse
-import gzip 
-import os 
+
 
 #BODY FUNTIONS
 def options_arg():

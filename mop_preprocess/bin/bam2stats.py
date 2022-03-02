@@ -4,7 +4,10 @@
 #
 # USAGE: bam2stats.py bam1 bam2 ... bamN
 
-import os, subprocess, sys
+import os
+import subprocess
+import sys
+
 
 def bam2stats(fn, flag=3840):
     """Get stats from samtools stats"""

@@ -3,7 +3,9 @@ desc= "Calculate mean current analysis per position from nanopolish event align 
 
 # Import required libraries:
 import argparse
+
 import pandas as pd
+
 
 def parse_input(file, size_chunks):
     

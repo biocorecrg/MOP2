@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-import sys, warnings,os
-import h5py, ont_fast5_api
+import os
+import sys
+import warnings
+
+import h5py
+import ont_fast5_api
 from ont_fast5_api.fast5_interface import get_fast5_file
 
 __author__ = 'Huanle.Liu@crg.eu'
