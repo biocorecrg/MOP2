@@ -171,7 +171,7 @@ Here an example of a final report:
    Newer versions of guppy automatically separate the reads depending on the quality. You need to disable this via custom options for being used in MoP3. This is also to avoid losing interesting signals since the modified bases have often low qualities. GUPPY 6 seems to require singularity 3.7.0 or higher.
    
 .. tip::
-   You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscore filtering. Some custom files are already available in this package, like drna_tool_splice_m6A_guppy6_opt.tsv
+   You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscore filtering. Some custom files are already available in this package, like **drna_tool_unsplice_guppy6_opt.tsv**
 
    
 
