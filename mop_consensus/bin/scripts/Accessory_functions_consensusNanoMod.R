@@ -84,7 +84,7 @@ epinano_processing <- function(sample_file, ivt_file, initial_position, final_po
 
 nanopolish_processing <- function(sample_file, ivt_file, initial_position, final_position, MZS_thr, chr, exclude_SNP, Coverage) {
   #Import data:
-  sample <- read_tab_file(sample_file)
+  sample <- read_csv_file(sample_file)
   
   #Add sample information:
   sample$feature <- 'Nanopolish'
@@ -94,7 +94,7 @@ nanopolish_processing <- function(sample_file, ivt_file, initial_position, final
   sample$reference <- paste(sample$contig_wt, sample$position, sep='_')
   
   #Import KO: 
-  raw_data_ivt <-read_tab_file(ivt_file)
+  raw_data_ivt <-read_csv_file(ivt_file)
   raw_data_ivt <- subset(raw_data_ivt, coverage>Coverage)
   colnames(raw_data_ivt)<- c("contig_ko","position","reference_kmer_ko", "event_level_median_ko", 'coverage')
   raw_data_ivt <- subset(raw_data_ivt, contig_ko == chr)

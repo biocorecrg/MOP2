@@ -84,7 +84,7 @@ workflow {
 	}.transpose().set{epinano}
 
 	unique_samples.map {
- 	  	 [it, file("${params.input_path}/nanopolish-compore_flow/${it}.tsv.gz")]
+ 	  	 [it, file("${params.input_path}/nanopolish-compore_flow/${it}.csv.gz")]
 	}.transpose().set{nanopolish}
 	
 	comparisons.map{
