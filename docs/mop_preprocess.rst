@@ -50,7 +50,7 @@ Input Parameters
    * - **filtering**
      -  Tool for filtering fastq files. **[nanofilt / NO]**
    * - **mapping**
-     -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]** 
+     -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / bwa / NO ]** 
    * - **counting**
      -  Tool for gene or transcripts counts **[htseq / nanocount / NO]**
    * - **discovery**
