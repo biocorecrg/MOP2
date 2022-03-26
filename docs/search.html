@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MOP_CONSENSUS &mdash; MoP2  documentation</title>
+  <title>Search &mdash; MoP2  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-    <link rel="canonical" href="https://biocorecrg.github.io/MoP2/docs/mop_consensus.html" />
+    <link rel="canonical" href="https://biocorecrg.github.io/MoP2/docs/search.html" />
+    
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -17,11 +17,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Resource reporting" href="reporting.html" />
-    <link rel="prev" title="MOP_MOD" href="mop_mod.html" /> 
+    <link rel="search" title="Search" href="#" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,20 +32,20 @@
             <a href="index.html" class="icon icon-home"> MoP2
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="#" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Master of Pores</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_preprocess.html">MOP_PREPROCESS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_tail.html">MOP_TAIL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mop_mod.html">MOP_MOD</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">MOP_CONSENSUS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mop_consensus.html">MOP_CONSENSUS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reporting.html">Resource reporting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">CHANGELOG</a></li>
@@ -65,9 +65,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>MOP_CONSENSUS</li>
+      <li>Search</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/mop_consensus.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -75,20 +74,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mop-consensus">
-<span id="home-page-mopconsensus"></span><h1>MOP_CONSENSUS<a class="headerlink" href="#mop-consensus" title="Permalink to this headline"></a></h1>
-<p>This module takes as input the output from MOP_MOD with all the four worklows. It outputs the consensus of the diferent predictions running the tool <a class="reference external" href="https://github.com/ADelgadoT/NanoConsensus">Nanoconsensus</a> in parallel on each transcript for each comparison.</p>
-<p>Here an example of a result:</p>
-<a class="reference internal image-reference" href="_images/nanocons.png"><img alt="_images/nanocons.png" src="_images/nanocons.png" style="width: 800px;" /></a>
-</section>
+  <noscript>
+  <div id="fallback" class="admonition warning">
+    <p class="last">
+      Please activate JavaScript to enable the search functionality.
+    </p>
+  </div>
+  </noscript>
 
+  
+  <div id="search-results">
+  
+  </div>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="mop_mod.html" class="btn btn-neutral float-left" title="MOP_MOD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="reporting.html" class="btn btn-neutral float-right" title="Resource reporting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 
@@ -110,7 +111,14 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+  <script>
+    jQuery(function() { Search.loadIndex("searchindex.js"); });
+  </script>
+  
+  <script id="searchindexloader"></script>
+   
+
 
 </body>
 </html>

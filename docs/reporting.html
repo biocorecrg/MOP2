@@ -4,20 +4,22 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resource reporting &mdash; Master of Pores 2  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Resource reporting &mdash; MoP2  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="canonical" href="https://biocorecrg.github.io/MoP2/docs/reporting.html" />
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Benchmark" href="benchmark.html" />
     <link rel="prev" title="MOP_CONSENSUS" href="mop_consensus.html" /> 
 </head>
@@ -27,10 +29,10 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Master of Pores 2
+            <a href="index.html" class="icon icon-home"> MoP2
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -59,7 +61,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Master of Pores 2</a>
+          <a href="index.html">MoP2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -69,6 +71,7 @@
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>Resource reporting</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/reporting.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -86,16 +89,16 @@
 </pre></div>
 </div>
 <p>Once the pipeline is finished you will have a comprehensive report with information about CPU, disk and memory usage for each execution and as a distribution for each process. Here an example:</p>
-<a class="reference internal image-reference" href="../_images/res_report.png"><img alt="../_images/res_report.png" src="../_images/res_report.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="_images/res_report.png"><img alt="_images/res_report.png" src="_images/res_report.png" style="width: 800px;" /></a>
 </section>
 <section id="live-reporting">
 <h2>Live reporting<a class="headerlink" href="#live-reporting" title="Permalink to this headline"></a></h2>
 <p>For having a live reporting your pipeline should run in an environment that has access to internet. Then you have to log-in to the <a class="reference external" href="https://tower.nf/">Tower.nf</a>  website that is developed and mantained by the good people at <a class="reference external" href="https://seqera.io/">Seqera Labs</a>.</p>
-<a class="reference internal image-reference" href="../_images/tower.png"><img alt="../_images/tower.png" src="../_images/tower.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="_images/tower.png"><img alt="_images/tower.png" src="_images/tower.png" style="width: 800px;" /></a>
 <p>We suggest you to use either the GitHub or the Google authentication:</p>
-<a class="reference internal image-reference" href="../_images/tower_eli1.png"><img alt="../_images/tower_eli1.png" src="../_images/tower_eli1.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="_images/tower_eli1.png"><img alt="_images/tower_eli1.png" src="_images/tower_eli1.png" style="width: 800px;" /></a>
 <p>You can generate your token at <a class="reference external" href="https://tower.nf/tokens">https://tower.nf/tokens</a> and</p>
-<a class="reference internal image-reference" href="../_images/tower2.png"><img alt="../_images/tower2.png" src="../_images/tower2.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="_images/tower2.png"><img alt="_images/tower2.png" src="_images/tower2.png" style="width: 800px;" /></a>
 <p>then you can export as an environmental variable.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export TOWER_ACCESS_TOKEN=*******YOUR***TOKEN*****HERE*******</span>
 </pre></div>
@@ -109,7 +112,7 @@
 </pre></div>
 </div>
 <p>Going back to the website you can see now your pipeline running and have a nice looking live reporting.</p>
-<a class="reference internal image-reference" href="../_images/tower.gif"><img alt="../_images/tower.gif" src="../_images/tower.gif" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="_images/tower.gif"><img alt="_images/tower.gif" src="_images/tower.gif" style="width: 800px;" /></a>
 </section>
 </section>
 
@@ -124,7 +127,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2019, CRG.</p>
+    <p>&#169; Copyright .</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
