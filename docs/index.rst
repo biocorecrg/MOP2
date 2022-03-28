@@ -37,7 +37,7 @@ Contents:
    mop_tail
    mop_mod
    mop_consensus
-   monitoring
+   reporting
    awsbatch
    benchmark
    changelog

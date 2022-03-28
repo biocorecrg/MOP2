@@ -4,8 +4,8 @@ desc= "Concatenate file(s) containing median current intensity values per positi
 # Import required libraries:
 import argparse
 import csv
+import gzip
 import statistics
-import gzip 
 
 
 def process_dicts(files):

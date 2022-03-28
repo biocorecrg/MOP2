@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import sys
 import gzip
-import pprint
 import os
+import pprint
+import sys
 
 usage = '''
 created by Huanle and Luca for Master of Pores! :)

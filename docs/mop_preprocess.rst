@@ -50,7 +50,7 @@ Input Parameters
    * - **filtering**
      -  Tool for filtering fastq files. **[nanofilt / NO]**
    * - **mapping**
-     -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / NO ]** 
+     -  Tool for mapping reads. **[minimap2 / graphmap / graphmap2 / bwa / NO ]** 
    * - **counting**
      -  Tool for gene or transcripts counts **[htseq / nanocount / NO]**
    * - **discovery**
@@ -141,6 +141,8 @@ or you can run the pipeline locally:
 .. note::
    To resume the execution, temporary files generated previously by the pipeline must be kept. Otherwise, pipeline will re-start from the beginning. 
 
+
+
 Results
 ====================
 
@@ -163,5 +165,14 @@ Here an example of a final report:
 .. image:: ../img/multiqc.png
   :width: 800  
 
+
+
+.. note::
+   Newer versions of guppy automatically separate the reads depending on the quality. You need to disable this via custom options for being used in MoP3. This is also to avoid losing interesting signals since the modified bases have often low qualities. GUPPY 6 seems to require singularity 3.7.0 or higher.
+   
+.. tip::
+   You can pass via parameter a custom NAME_tool_opt.tsv file with custom guppy options to disable the qscore filtering. Some custom files are already available in this package, like **drna_tool_unsplice_guppy6_opt.tsv**
+
+   
 
 
