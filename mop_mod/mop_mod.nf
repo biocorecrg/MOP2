@@ -275,8 +275,8 @@ workflow compore_polish_flow {
 		concat_chunks = concat_mean_per_pos(mean_pps.groupTuple().combine(chromFiles))
 		concat_csv_files(concat_chunks.groupTuple())
 		
-		//combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
-		//NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
+		combs_events = mapIDPairs(comparisons, outnp.collapsed_aligned_events)
+		NANOCOMPORE_SAMPLE_COMPARE(combs_events, ref_file)
 	
 }
 
