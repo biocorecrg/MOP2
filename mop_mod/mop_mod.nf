@@ -131,7 +131,7 @@ workflow {
  	  	 [it, file("${params.input_path}/QC_files/${it}_final_summary.stats")]
 	}.transpose().set{summaries}
 	unique_samples.map {
- 	  	 [it, file("${params.input_path}/fast5_files/${it}/")]
+ 	  	 [it, file("${params.input_path}/fast5_files/${it}/", type: 'dir')]
 	}.transpose().set{fast5_folders}
 
 	unique_samples.map {
