@@ -23,7 +23,7 @@ log.info """
 BIOCORE@CRG Master of Pores 2. Preprocessing - N F  ~  version ${version}
 ====================================================
 
-conffile				  : ${params.conffile}
+conffile.                 : ${params.conffile}
 
 fast5                     : ${params.fast5}
 fastq                     : ${params.fastq}
@@ -31,10 +31,10 @@ fastq                     : ${params.fastq}
 reference                 : ${params.reference}
 annotation                : ${params.annotation}
 
-granularity		  		  : ${params.granularity}
+granularity.              : ${params.granularity}
 
 ref_type                  : ${params.ref_type}
-pars_tools		  		  : ${params.pars_tools}
+pars_tools                : ${params.pars_tools}
 
 output                    : ${params.output}
 
@@ -42,20 +42,19 @@ GPU                       : ${params.GPU}
 
 basecalling               : ${params.basecalling} 
 demultiplexing            : ${params.demultiplexing} 
-demulti_fast5		      : ${params.demulti_fast5}
+demulti_fast5             : ${params.demulti_fast5}
 
 filtering                 : ${params.filtering}
 mapping                   : ${params.mapping}
 
 counting                  : ${params.counting}
-discovery		          : ${params.discovery}
+discovery                 : ${params.discovery}
 
 cram_conv           	  : ${params.cram_conv}
-subsampling_cram	      : ${params.subsampling_cram}
+subsampling_cram          : ${params.subsampling_cram}
 
 
-saveSpace   		      : ${params.saveSpace}
-
+saveSpace                 : ${params.saveSpace}
 email                     : ${params.email}
 """
 
