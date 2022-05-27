@@ -493,7 +493,9 @@ workflow preprocess_simple {
 
 	// OPTIONAL Perform COUNTING / ASSIGNMENT
 	if (params.counting == "nanocount" && params.ref_type == "transcriptome") {
-		read_counts = NANOCOUNT(sorted_alns)
+		read_counts = NANOCOUNT(sorted_alns.join(aln_indexes))
+
+		//read_counts = NANOCOUNT(sorted_alns)
 		assignments = AssignReads(sorted_alns, "nanocount")
 		stat_counts = countStats(assignments)
 		stats_counts = joinCountStats(stat_counts.map{ it[1]}.collect())
