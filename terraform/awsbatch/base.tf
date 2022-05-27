@@ -52,7 +52,7 @@ variable "instance_count" {
 
 variable "repourl" {
   type    = string
-  default = "https://github.com/biocorecrg/SIB_course_nextflow_Nov_2021"
+  default = "https://github.com/biocorecrg/MOP2"
 }
 
 variable "bucket_prefix" {
