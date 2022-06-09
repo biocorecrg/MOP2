@@ -54,3 +54,17 @@ Testing
   You can replace ```-with-singularity``` with ```-with-docker``` if you want to use the docker engine.
 
 
+Apple M1 processor
+====================
+
+Use the profile **m1mac** for running on machine with Apple M1 processor.
+Even better, I added a new profile:
+
+
+.. code-block:: console
+
+  cd mop_preprocess
+
+  nextflow run mop_preprocess.nf -with-singularity -bg -profile m1mac > log
+
+
