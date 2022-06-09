@@ -57,8 +57,7 @@ Testing
 Apple M1 processor
 ====================
 
-Use the profile **m1mac** for running on machine with Apple M1 processor.
-Even better, I added a new profile:
+Use the profile **m1mac** for running on machines with Apple M1 processor.
 
 
 .. code-block:: console
