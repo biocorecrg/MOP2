@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
@@ -80,10 +81,10 @@
            <div itemprop="articleBody">
              
   <section id="resource-reporting">
-<span id="home-page-reporting"></span><h1>Resource reporting<a class="headerlink" href="#resource-reporting" title="Permalink to this headline"></a></h1>
+<span id="home-page-reporting"></span><h1>Resource reporting<a class="headerlink" href="#resource-reporting" title="Permalink to this heading"></a></h1>
 <p>Since each MOP pipeline is based on <a class="reference external" href="https://www.nextflow.io/">Nextflow</a> we can use its embedded functions for reporting the use of resources as a html file and to have a live reporting.</p>
 <section id="html-report">
-<h2>Html report<a class="headerlink" href="#html-report" title="Permalink to this headline"></a></h2>
+<h2>Html report<a class="headerlink" href="#html-report" title="Permalink to this heading"></a></h2>
 <p>For enabling the generation of a report just run each pipeline with the parameter <cite>-with-report</cite> as in the following example:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">nextflow run mop_preprocess.nf -profile local -with-docker -bg -with-report</span>
 </pre></div>
@@ -92,7 +93,7 @@
 <a class="reference internal image-reference" href="_images/res_report.png"><img alt="_images/res_report.png" src="_images/res_report.png" style="width: 800px;" /></a>
 </section>
 <section id="live-reporting">
-<h2>Live reporting<a class="headerlink" href="#live-reporting" title="Permalink to this headline"></a></h2>
+<h2>Live reporting<a class="headerlink" href="#live-reporting" title="Permalink to this heading"></a></h2>
 <p>For having a live reporting your pipeline should run in an environment that has access to internet. Then you have to log-in to the <a class="reference external" href="https://tower.nf/">Tower.nf</a>  website that is developed and mantained by the good people at <a class="reference external" href="https://seqera.io/">Seqera Labs</a>.</p>
 <a class="reference internal image-reference" href="_images/tower.png"><img alt="_images/tower.png" src="_images/tower.png" style="width: 800px;" /></a>
 <p>We suggest you to use either the GitHub or the Google authentication:</p>

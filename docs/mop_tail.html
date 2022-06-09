@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
@@ -81,10 +82,10 @@
            <div itemprop="articleBody">
              
   <section id="mop-tail">
-<span id="home-page-moptail"></span><h1>MOP_TAIL<a class="headerlink" href="#mop-tail" title="Permalink to this headline"></a></h1>
+<span id="home-page-moptail"></span><h1>MOP_TAIL<a class="headerlink" href="#mop-tail" title="Permalink to this heading"></a></h1>
 <p>This module takes as input the output from MOP_PREPROCESS: basecalled fast5 reads, together with their respective fastq files, alignment and assignment read ID to gene/transcript. It outputs the estimation of poly(A) tail length at read level provided by <strong>Tailfindr</strong>, <strong>Nanopolish</strong> or both.</p>
 <section id="input-parameters">
-<h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this headline"></a></h2>
+<h2>Input Parameters<a class="headerlink" href="#input-parameters" title="Permalink to this heading"></a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 25%" />
@@ -121,7 +122,7 @@
 </table>
 </section>
 <section id="how-to-run-the-pipeline">
-<h2>How to run the pipeline<a class="headerlink" href="#how-to-run-the-pipeline" title="Permalink to this headline"></a></h2>
+<h2>How to run the pipeline<a class="headerlink" href="#how-to-run-the-pipeline" title="Permalink to this heading"></a></h2>
 <p>Before launching the pipeline,user should:</p>
 <ol class="arabic simple">
 <li><p>Decide which containers to use - either docker or singularity <strong>[-with-docker / -with-singularity]</strong>.</p></li>
@@ -159,7 +160,7 @@
 <p>To check whether the pipeline has been resumed properly, please check the log file. If previous correctly executed process are found as <em>Cached</em>, resume worked!</p>
 </section>
 <section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline"></a></h2>
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
 <p>Several folders are created by the pipeline within the output directory specified by the <strong>output</strong> parameter:</p>
 <ol class="arabic simple">
 <li><p>NanoPolish: contains the output of <em>nanopolish</em> tool.</p></li>
