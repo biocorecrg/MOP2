@@ -38,6 +38,13 @@ nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
 
 ```
 
-## Documentation
+## Reference
+If you use this tool, please cite our paper:
 
-The documentation is available at [https://biocorecrg.github.io/MOP2/docs/](https://biocorecrg.github.io/MOP2/docs/)
+["MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets"
+Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-Tejedor, Julia Ponomarenko, Eva Maria Novoa.
+*Front. Genet., 17 March 2020.* https://doi.org/10.3389/fgene.2020.00211](https://www.frontiersin.org/articles/10.3389/fgene.2020.00211/full)
+
+
+## Documentation
+The documentation is available at [https://biocorecrg.github.io/MOP2/docs/](https://biocorecrg.github.io/MOP2/docs/about.html)
