@@ -36,7 +36,7 @@ Version 2.0
      * Fine tuning of parameter for each step in tools_opt.tsv
 
 * mop_mod (formerly known as nanoMod)
-   * coming SOON!
+   * 
 
 Version 1.1
 =================
