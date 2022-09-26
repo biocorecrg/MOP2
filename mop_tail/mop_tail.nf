@@ -108,7 +108,7 @@ workflow {
 	if (params.tailfindr == "YES" && params.nanopolish == "YES") {
                 log.info "Joining results"
 				//nanores.filtered_est.view()
-                join_nanotail_results(tailres.length.join(nanores.filtered_est).join(assigned), joinScript)
+                join_nanotail_results(nanores.filtered_est.join(tailres.length).join(assigned), joinScript)
 
 	}
 
