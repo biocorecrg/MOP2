@@ -8,6 +8,10 @@ MOP_PREPROCESS
    :toctree: generated
 
 This module takes as input the raw fast5 reads - single or multi - and produces a number of outputs (basecalled fast5, sequences in fastq format, aligned reads in BAM format etc). The pre-processing module is able to perform base-calling, demultiplexing (optional), filtering, quality control, mapping to a genome / transcriptome reference, feature counting, discovery of novel transcripts and it generates a final report of the performance and results of each of the steps performed. It automatically detects the kind of input fast5 file (single or multi sequence).
+
+.. note::
+   For using the Apple's M1 processor you should use the custom profile **m1mac** and **docker**.
+
   
 
 Input Parameters
