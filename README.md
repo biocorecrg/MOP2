@@ -39,7 +39,10 @@ nextflow run mop_preprocess.nf -with-singularity -bg -profile local > log
 ```
 
 ## Reference
-If you use this tool, please cite our paper:
+If you use this tool, please cite our papers:
+
+["Nanopore Direct RNA Sequencing Data Processing and Analysis Using MasterOfPores"
+Cozzuto L, Delgado-Tejedor A, Hermoso Pulido T, Novoa EM, Ponomarenko J. *N. Methods Mol Biol. 2023*;2624:185-205. doi: 10.1007/978-1-0716-2962-8_13.](https://link.springer.com/protocol/10.1007/978-1-0716-2962-8_13)
 
 ["MasterOfPores: A Workflow for the Analysis of Oxford Nanopore Direct RNA Sequencing Datasets"
 Luca Cozzuto, Huanle Liu, Leszek P. Pryszcz, Toni Hermoso Pulido, Anna Delgado-Tejedor, Julia Ponomarenko, Eva Maria Novoa.
