@@ -28,5 +28,5 @@ params {
 
     saveSpace           = "NO"
 
-    email               = "lucacozzuto@crg.es"
+    email               = ""
 }
