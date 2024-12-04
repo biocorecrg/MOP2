@@ -14,6 +14,9 @@
 
 Inspired by Metallica's [Master Of Puppets](https://www.youtube.com/watch?v=S7blkui3nQc)
 
+# WE MOVED THIS TOOL TO https://github.com/biocorecrg/master_of_pores AND RELEASED A NEW VERSION!
+This repository will be archived
+
 ## Install
 Please install nextflow and singularity or docker before.
 
